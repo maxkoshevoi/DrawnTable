@@ -1,0 +1,6 @@
+C:\Users\Mi\Downloads\Telegram Desktop\KitTimetable\KitTimetable\DrawnTable\bin\Release\DrawnTableControl.dll
+C:\Users\Mi\Downloads\Telegram Desktop\KitTimetable\KitTimetable\DrawnTable\bin\Release\DrawnTableControl.pdb
+C:\Users\Mi\Downloads\Telegram Desktop\KitTimetable\KitTimetable\DrawnTable\obj\Release\DrawnTableControl.csprojAssemblyReference.cache
+C:\Users\Mi\Downloads\Telegram Desktop\KitTimetable\KitTimetable\DrawnTable\obj\Release\DrawnTableControl.csproj.CoreCompileInputs.cache
+C:\Users\Mi\Downloads\Telegram Desktop\KitTimetable\KitTimetable\DrawnTable\obj\Release\DrawnTableControl.dll
+C:\Users\Mi\Downloads\Telegram Desktop\KitTimetable\KitTimetable\DrawnTable\obj\Release\DrawnTableControl.pdb

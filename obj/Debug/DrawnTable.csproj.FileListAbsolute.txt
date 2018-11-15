@@ -1,0 +1,9 @@
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\obj\Debug\DrawnTable.csprojAssemblyReference.cache
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\obj\Debug\DrawnTable.csproj.CoreCompileInputs.cache
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\bin\Debug\DrawnTable.dll
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\bin\Debug\DrawnTable.pdb
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\obj\Debug\DrawnTable.dll
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\obj\Debug\DrawnTable.pdb
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\bin\Debug\System.ValueTuple.dll
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\bin\Debug\System.ValueTuple.xml
+E:\!Флешка\Программирование\Кит\KitTimetable\KitTimetable\DrawnTable\obj\Debug\DrawnTable.csproj.CopyComplete
