@@ -11,10 +11,9 @@ namespace DrawnTableControl.Models
     public class DrawnTableCells : IEnumerable<DrawnTableCell>
     {
         int lastId;
-        DrawnTable table;
-
-        List<DrawnTableCell> cells;
-        Dictionary<int, RectangleF> cellsArea;
+        readonly DrawnTable table;
+        readonly List<DrawnTableCell> cells;
+        readonly Dictionary<int, RectangleF> cellsArea;
 
         public DrawnTableBackColors BackColors { get; private set; }
 
@@ -113,7 +112,7 @@ namespace DrawnTableControl.Models
             {
                 if (table.IfCellsOverlap == DrawnTableOverlapOptions.ThrowError)
                 {
-                    throw new ArgumentException("Duplicate entry", "location");
+                    throw new ArgumentException("Duplicate entry", nameof(cell));
                 }
 
                 RectangleF area = RectangleF.Empty;
@@ -187,7 +186,7 @@ namespace DrawnTableControl.Models
                 Rectangle rct = Projection(newCell, existingCell);
                 DrawnTableCell result = new DrawnTableCell(new CellLocation(rct.Y, rct.X), null, rct.Height);
                 if (newCell.Value == existingCell.Value) result.Value = newCell.Value;
-                result.GetFontFromTable = (newCell.GetFontFromTable == existingCell.GetFontFromTable) ? newCell.GetFontFromTable : false;
+                result.GetFontFromTable = (newCell.GetFontFromTable == existingCell.GetFontFromTable) && newCell.GetFontFromTable;
                 if (result.GetFontFromTable == false)
                 {
                     result.Font = !newCell.GetFontFromTable ? newCell.Font : existingCell.Font;
@@ -357,8 +356,8 @@ namespace DrawnTableControl.Models
         #region BackColors
         public class DrawnTableBackColors
         {
-            DrawnTable table;
-            Color[,] backColors;
+            readonly DrawnTable table;
+            readonly Color[,] backColors;
 
             public DrawnTableBackColors(DrawnTable Table)
             {

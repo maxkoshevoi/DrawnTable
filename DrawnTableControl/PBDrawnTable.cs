@@ -44,7 +44,7 @@ namespace DrawnTableControl
 
         #region Mouse
         // Всплывающая подсказка
-        ToolTip toolTip;
+        readonly ToolTip toolTip;
         // Необходимо для реализации DradAndDrop
         internal bool? mouseDown = false;
         Point startDrag;
@@ -90,7 +90,7 @@ namespace DrawnTableControl
                         Table.dRedrawEx.Pause();
 
                         dragBackground = (Bitmap)Table.table.Clone();
-                        Graphics g = Table.GetGraphics(dragBackground);
+                        Graphics g = GetGraphics(dragBackground);
 
                         // Drawing back colors
                         Table.DrawBackColors(g);
@@ -113,9 +113,9 @@ namespace DrawnTableControl
                         CellLocation? cLoc = Table.GetCellLocation(e.Location);
                         if (cLoc != null && Table.Cells[(CellLocation)cLoc] == null)
                         {
-                            DrawnTableCell cell = new DrawnTableCell(cLoc.Value);
+                            DrawnTableCell cell = new(cLoc.Value);
                             Table.Cells.Add(cell, false);
-                            CellChangedEventArgs args = new CellChangedEventArgs(cLoc.Value);
+                            CellChangedEventArgs args = new(cLoc.Value);
                             Table.OnCellCreating(args);
                             if (!args.Handled)
                             {
@@ -145,7 +145,7 @@ namespace DrawnTableControl
                 Table.dRedrawEx.Join();
                 if (action == InteractAction.CellCreating)
                 {
-                    CellChangedEventArgs args = new CellChangedEventArgs(interactWith.Location);
+                    CellChangedEventArgs args = new(interactWith.Location);
                     Table.OnCellCreated(args);
                     if (args.Handled)
                     {
@@ -356,7 +356,7 @@ namespace DrawnTableControl
             g.SmoothingMode = SmoothingMode.HighSpeed;
             g.CompositingQuality = CompositingQuality.HighSpeed;
 
-            RectangleF rect = new RectangleF(e.X - (startDrag.X - area.X), e.Y - (startDrag.Y - area.Y), area.Width, area.Height);
+            RectangleF rect = new(e.X - (startDrag.X - area.X), e.Y - (startDrag.Y - area.Y), area.Width, area.Height);
             CellLocation? cLoc = Table.GetCellLocation(new PointF(rect.X + rect.Width / 2, (int)(rect.Y + Table.RowHeight / 2)));
             if (cLoc != null)
             {
@@ -389,7 +389,7 @@ namespace DrawnTableControl
                         }
                         if (isOk)
                         {
-                            CellMovedEventArgs args = new CellMovedEventArgs(cLoc.Value, interactWith.Location);
+                            CellMovedEventArgs args = new(cLoc.Value, interactWith.Location);
                             Table.OnCellDragOver(args);
                             if (args.Handled)
                             {
@@ -421,7 +421,7 @@ namespace DrawnTableControl
                 return;
             }
 
-            Table.DrawCell(interactWith.ToString(), interactWith.Font, new SolidBrush(Color.FromArgb(150, interactWith.Brush.Color)), rect, new StringFormat() { Alignment = interactWith.Alignment, LineAlignment = interactWith.LineAlignment }, g);
+            DrawCell(interactWith.ToString(), interactWith.Font, new SolidBrush(Color.FromArgb(150, interactWith.Brush.Color)), rect, new StringFormat() { Alignment = interactWith.Alignment, LineAlignment = interactWith.LineAlignment }, g);
 
             g.Dispose();
             Image?.Dispose();

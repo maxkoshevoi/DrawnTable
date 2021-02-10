@@ -20,11 +20,7 @@
         public static bool operator !=(CellLocation one, CellLocation other) => !(one == other);
         public override bool Equals(object obj)
         {
-            if (obj is CellLocation)
-            {
-                return (CellLocation)obj == this;
-            }
-            return base.Equals(obj);
+            return obj is CellLocation location ? location == this : base.Equals(obj);
         }
         public override int GetHashCode()
         {

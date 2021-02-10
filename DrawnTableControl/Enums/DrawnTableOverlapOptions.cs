@@ -1,4 +1,9 @@
 ﻿namespace DrawnTableControl.Enums
 {
-    public enum DrawnTableOverlapOptions { ThrowError, ReplaceWithCounter, Merge }
+    public enum DrawnTableOverlapOptions 
+    { 
+        ThrowError, 
+        ReplaceWithCounter, 
+        Merge 
+    }
 }

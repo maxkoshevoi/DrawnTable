@@ -110,7 +110,7 @@ namespace DrawnTableControl
         //public int CellMargin { get; set; } = 2;
 
         internal Bitmap table { get; private set; }
-        PBDrawnTable Owner;
+        readonly PBDrawnTable Owner;
         internal DeferredExecution dRedrawEx;
         internal bool isRedrawingSuspended = false;
 
@@ -243,9 +243,7 @@ namespace DrawnTableControl
         #endregion
 
         #region Draw
-        private Graphics GetGraphics() => GetGraphics(Owner.Image);
-
-        internal Graphics GetGraphics(Image image)
+        internal static Graphics GetGraphics(Image image)
         {
             Graphics graphics = Graphics.FromImage(image);
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -259,16 +257,16 @@ namespace DrawnTableControl
             dRedrawEx.Execute(() => ActualRedraw());
         }
 
-        void ActualRedraw(RectangleF area = default(RectangleF))
+        void ActualRedraw(RectangleF area = default)
         {
             if (isRedrawingSuspended) return;
 
-            if (area == default(RectangleF))
+            if (area == default)
             {
                 area = TableArea;
             }
 
-            Bitmap img = new Bitmap(Math.Max(5, Owner.Width), Math.Max(5, Owner.Height));
+            Bitmap img = new(Math.Max(5, Owner.Width), Math.Max(5, Owner.Height));
             Graphics g = GetGraphics(img);
 
             ActualRedraw(g, area);
@@ -361,7 +359,7 @@ namespace DrawnTableControl
 
         private Bitmap RedrawBackground()
         {
-            Bitmap img = new Bitmap((int)TableArea.Width, (int)TableArea.Height);
+            Bitmap img = new((int)TableArea.Width, (int)TableArea.Height);
             Graphics g = Graphics.FromImage(img);
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -484,7 +482,7 @@ namespace DrawnTableControl
 
             return res;
         }
-        internal RectangleF DrawCell(string text, Font font, Brush brush, RectangleF area, StringFormat format = null, Graphics g = null)
+        internal static RectangleF DrawCell(string text, Font font, Brush brush, RectangleF area, StringFormat format = null, Graphics g = null)
         {
             int padding = 2;
 
@@ -528,7 +526,7 @@ namespace DrawnTableControl
         internal RectangleF GetCellArea(CellLocation cellLocation) => GetCellArea(cellLocation.Row, cellLocation.Column);
         internal RectangleF GetCellArea(int row, int col)
         {
-            RectangleF area = new RectangleF(CellsArea.X + col * (ColumnWidth + 1) + 1, CellsArea.Y + row * (RowHeight + 1) + 1, ColumnWidth, RowHeight);
+            RectangleF area = new(CellsArea.X + col * (ColumnWidth + 1) + 1, CellsArea.Y + row * (RowHeight + 1) + 1, ColumnWidth, RowHeight);
 
             // Correcting Width or/and Height by 1 if there is no line right from the column or/and under the row 
             foreach (DrawnTableHeader colH in ColumnHeaders)
@@ -584,7 +582,7 @@ namespace DrawnTableControl
 
         public static bool IsInArea(RectangleF area, PointF point) => (point.X >= area.X && point.Y >= area.Y && point.X <= area.Right && point.Y <= area.Bottom);
 
-        private int CountHeaders(IEnumerable<DrawnTableHeader> headers)
+        private static int CountHeaders(IEnumerable<DrawnTableHeader> headers)
         {
             if (headers == null)
             {

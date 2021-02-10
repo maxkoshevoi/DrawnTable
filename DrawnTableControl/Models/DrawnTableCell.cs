@@ -146,11 +146,7 @@ namespace DrawnTableControl.Models
 
         public override bool Equals(object obj)
         {
-            if (obj is DrawnTableCell)
-            {
-                return (DrawnTableCell)obj == this;
-            }
-            return base.Equals(obj);
+            return obj is DrawnTableCell cell ? cell == this : base.Equals(obj);
         }
 
         public override int GetHashCode()

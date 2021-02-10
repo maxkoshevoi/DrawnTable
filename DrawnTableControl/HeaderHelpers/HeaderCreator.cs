@@ -25,7 +25,7 @@ namespace DrawnTableControl.HeaderHelpers
 
         public static List<DrawnTableHeader> ParseList(IEnumerable<Tuple<string, object>> collection)
         {
-            List<DrawnTableHeader> res = new List<DrawnTableHeader>();
+            List<DrawnTableHeader> res = new();
             foreach (var item in collection)
             {
                 res.Add(new DrawnTableHeader(item.Item1, tag: item.Item2));
@@ -33,7 +33,7 @@ namespace DrawnTableControl.HeaderHelpers
             return res;
         }
 
-        public int GetRealIndex(List<DrawnTableHeader> headers, int headerIndex, int subheaderIndex)
+        public static int GetRealIndex(List<DrawnTableHeader> headers, int headerIndex, int subheaderIndex)
         {
             if (headerIndex < 0 || headerIndex >= headers.Count || subheaderIndex < 0)
             {
@@ -60,7 +60,7 @@ namespace DrawnTableControl.HeaderHelpers
             return realIndex;
         }
 
-        public Tuple<DrawnTableHeader, DrawnTableSubheader> GetHeadersByRealIndex(List<DrawnTableHeader> headers, int realIndex)
+        public static Tuple<DrawnTableHeader, DrawnTableSubheader> GetHeadersByRealIndex(List<DrawnTableHeader> headers, int realIndex)
         {
             if (realIndex < 0)
             {

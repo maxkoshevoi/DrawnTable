@@ -13,15 +13,6 @@ namespace DrawnTableControl.EventArguments
             Location = location;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the CellEventArgs class. 
-        /// </summary>
-        /// <param name="e">An ordinary <see cref="EventArguments"/> argument to be extended.</param>
-        internal CellEventArgs(EventArgs e, CellLocation location) : base()
-        {
-            Location = location;
-        }
-
         private CellLocation location;
         /// <summary>
         /// Location of cell that caused the event.

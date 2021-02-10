@@ -7,7 +7,8 @@ namespace DrawnTableControl.Services
 {
     public class PrintingManager : IDisposable
     {
-        private DrawnTable table;
+        private readonly DrawnTable table;
+
         private PrintDocument printDocument;
         public PrintDocument PrintDocument
         {
@@ -21,7 +22,7 @@ namespace DrawnTableControl.Services
                 {
                     printDocument = new PrintDocument();
                     printDocument.DefaultPageSettings.Landscape = true;
-                    printDocument.PrintPage += new PrintPageEventHandler(pd_PrintPage);
+                    printDocument.PrintPage += new PrintPageEventHandler(OnPrintPage);
                 }
                 return printDocument;
             }
@@ -49,7 +50,7 @@ namespace DrawnTableControl.Services
 		/// </summary>
 		public void PageSetup()
         {
-            PageSetupDialog pageSetupDialog = new PageSetupDialog
+            PageSetupDialog pageSetupDialog = new()
             {
                 Document = PrintDocument
             };
@@ -61,7 +62,7 @@ namespace DrawnTableControl.Services
 		/// </summary>
 		public void PrintPreview()
         {
-            PrintPreviewDialog printPreviewDialog = new PrintPreviewDialog
+            PrintPreviewDialog printPreviewDialog = new()
             {
                 Document = PrintDocument
             };
@@ -78,7 +79,7 @@ namespace DrawnTableControl.Services
             if (showPrintDialog)
             {
                 // Create and show Print dialog
-                PrintDialog printDialog = new PrintDialog
+                PrintDialog printDialog = new()
                 {
                     UseEXDialog = true,
                     Document = PrintDocument
@@ -101,7 +102,7 @@ namespace DrawnTableControl.Services
 		/// </summary>
 		/// <param name="sender">Sender object.</param>
 		/// <param name="ev">Event parameters.</param>
-		private void pd_PrintPage(object sender, PrintPageEventArgs ev)
+		private void OnPrintPage(object sender, PrintPageEventArgs ev)
         {
             if (table.IsEnabled)
             {
@@ -121,6 +122,7 @@ namespace DrawnTableControl.Services
         public void Dispose()
         {
             printDocument?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

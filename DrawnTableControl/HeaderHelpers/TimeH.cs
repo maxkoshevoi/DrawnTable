@@ -9,7 +9,7 @@ namespace DrawnTableControl.HeaderHelpers
     {
         int tSpan = 1;
         TimeSpan tStart, tStop, tDelta;
-        List<DrawnTableHeader> lastHeaderResult = new List<DrawnTableHeader>();
+        readonly List<DrawnTableHeader> lastHeaderResult = new();
 
         public List<DrawnTableHeader> LastGeneratedHeaders => lastHeaderResult;
 
@@ -22,7 +22,7 @@ namespace DrawnTableControl.HeaderHelpers
 
             while (start <= stop)
             {
-                DrawnTableHeader header = new DrawnTableHeader(start.ToString(format), span: span, tag: new Tuple<TimeSpan, TimeSpan>(start, start.Add(delta)));
+                DrawnTableHeader header = new(start.ToString(format), span: span, tag: new Tuple<TimeSpan, TimeSpan>(start, start.Add(delta)));
                 lastHeaderResult.Add(header);
                 yield return header;
                 start = start.Add(delta);

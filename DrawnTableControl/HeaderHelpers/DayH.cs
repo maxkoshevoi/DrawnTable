@@ -8,7 +8,7 @@ namespace DrawnTableControl.HeaderHelpers
 {
     public class DayH : IHeaderCreator<DateTime, int>
     {
-        public DateTime GetWeeksMonday(DateTime? dt = null)
+        public static DateTime GetWeeksMonday(DateTime? dt = null)
         {
             if (dt == null)
             {
@@ -20,9 +20,9 @@ namespace DrawnTableControl.HeaderHelpers
             }
             return dt.Value;
         }
-        
-        List<DateTime> lastResult = new List<DateTime>();
-        List<DrawnTableHeader> lastHeaderResult = new List<DrawnTableHeader>();
+
+        readonly List<DateTime> lastResult = new();
+        readonly List<DrawnTableHeader> lastHeaderResult = new();
 
         public List<DrawnTableHeader> LastGeneratedHeaders => lastHeaderResult;
 
@@ -44,7 +44,7 @@ namespace DrawnTableControl.HeaderHelpers
 
             start = start.Date;
             end = end.Date;
-            if (start > end) throw new ArgumentOutOfRangeException("\"start\" can't be bigger then \"end\"");
+            if (start > end) throw new ArgumentOutOfRangeException($"\"{nameof(start)}\" can't be bigger then \"{nameof(end)}\"");
             
             lastResult.Clear();
             lastHeaderResult.Clear();

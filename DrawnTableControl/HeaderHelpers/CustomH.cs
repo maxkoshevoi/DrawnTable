@@ -6,7 +6,7 @@ namespace DrawnTableControl.HeaderHelpers
 {
     public class CustomH
     {
-        List<DrawnTableHeader> list = new List<DrawnTableHeader>();
+        List<DrawnTableHeader> list = new();
         
         public int Count => list.Count;
 

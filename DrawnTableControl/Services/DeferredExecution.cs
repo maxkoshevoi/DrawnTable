@@ -79,7 +79,7 @@ namespace DrawnTableControl.Services
                     Thread.Sleep(MinDelay);
                 } while (true);
             }
-#pragma warning disable CS0168
+#pragma warning disable CS0168, IDE0059
             catch (Exception ex)
             {
                 return;
@@ -105,13 +105,10 @@ namespace DrawnTableControl.Services
             }
         }
 
-        private int GetControlThreadId(Control control)
+        private static int GetControlThreadId(Control control)
         {
             int threadId = -1;
-            control.Invoke(new Action(() =>
-            {
-                threadId = Thread.CurrentThread.ManagedThreadId;
-            }));
+            control.Invoke(new Action(() => threadId = Thread.CurrentThread.ManagedThreadId));
             return threadId;
         }
     }

@@ -20,7 +20,7 @@ namespace DrawnTableControl.Models
 
         public override string ToString()
         {
-            return Value.Count().ToString();
+            return Value.Count.ToString();
         }
     }
 }
