@@ -7,30 +7,18 @@ namespace DrawnTableControl.HeaderHelpers
 {
     public class HeaderCreator
     {
-        public DayH Day { get; }
-        public TimeH Time { get; }
-        public CustomH Custom1 { get; }
-        public CustomH Custom2 { get; }
-
-        public HeaderCreator()
-        {
-            Day = new DayH();
-            Time = new TimeH();
-            Custom1 = new CustomH();
-            Custom2 = new CustomH();
-        }
+        public DayH Day { get; } = new();
+        public TimeH Time { get; } = new();
+        public CustomH Custom1 { get; } = new();
+        public CustomH Custom2 { get; } = new();
 
         public static List<DrawnTableHeader> ParseList(IEnumerable<string> collection) =>
             ParseList(collection.Select(c => new Tuple<string, object>(c, null)));
 
-        public static List<DrawnTableHeader> ParseList(IEnumerable<Tuple<string, object>> collection)
-        {
-            return collection
-                .Select(item => new DrawnTableHeader(item.Item1, tag: item.Item2))
-                .ToList();
-        }
+        public static List<DrawnTableHeader> ParseList(IEnumerable<Tuple<string, object>> collection) =>
+            collection.Select(item => new DrawnTableHeader(item.Item1, tag: item.Item2)).ToList();
 
-        public static int GetRealIndex(List<DrawnTableHeader> headers, int headerIndex, int subheaderIndex)
+        public int GetRealIndex(List<DrawnTableHeader> headers, int headerIndex, int subheaderIndex)
         {
             if (headerIndex < 0 || headerIndex >= headers.Count || subheaderIndex < 0)
             {
@@ -57,7 +45,7 @@ namespace DrawnTableControl.HeaderHelpers
             return realIndex;
         }
 
-        public static Tuple<DrawnTableHeader, DrawnTableSubheader> GetHeadersByRealIndex(List<DrawnTableHeader> headers, int realIndex)
+        public Tuple<DrawnTableHeader, DrawnTableSubheader> GetHeadersByRealIndex(List<DrawnTableHeader> headers, int realIndex)
         {
             if (realIndex < 0)
             {

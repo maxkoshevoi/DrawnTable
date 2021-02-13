@@ -12,6 +12,10 @@ namespace DrawnTableControl.HeaderHelpers
 
         public List<DrawnTableHeader> LastGeneratedHeaders { get; } = new List<DrawnTableHeader>();
 
+        internal TimeH()
+        {
+        }
+
         public IEnumerable<DrawnTableHeader> GenerateHeaders(TimeSpan start, TimeSpan stop, TimeSpan delta, int span = 1, string format = "hh\\:mm")
         {
             tStart = start;

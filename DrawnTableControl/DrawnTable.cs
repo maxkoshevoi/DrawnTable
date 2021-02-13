@@ -27,7 +27,7 @@ namespace DrawnTableControl
             {
                 if (allowDragDrop == value) return;
 
-                if (CellCopyMode == DrawnTableCopyMode.CtrlAndDrag && value)
+                if (CellCopyMode == DrawnTableCopyMode.CtrlAndDrag && !value)
                 {
                     throw new InvalidOperationException($"Selected {nameof(CellCopyMode)} option require CellDragDrop. Change {nameof(CellCopyMode)} to something else first.");
                 }

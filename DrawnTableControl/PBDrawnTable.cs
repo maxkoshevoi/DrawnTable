@@ -207,7 +207,7 @@ namespace DrawnTableControl
                         }
                     }
 
-                    //Click
+                    // Click
                     if (sameCell && action == InteractAction.Click)
                     {
                         if (interactWith is DrawnTableCellsOverlap)

@@ -10,32 +10,27 @@ namespace DrawnTableControl.HeaderHelpers
 
         public List<DrawnTableHeader> Headers { get; private set; } = new();
 
-        public void Add(string data)
+        internal CustomH()
         {
+        }
+
+        public void Add(string data) =>
             Headers.Add(new DrawnTableHeader(data));
-        }
 
-        public void Add(string data, object tag)
-        {
+        public void Add(string data, object tag) =>
             Headers.Add(new DrawnTableHeader(data, tag: tag));
-        }
 
-        public void Add(DrawnTableHeader header)
-        {
+        public void Add(DrawnTableHeader header) =>
             Headers.Add(header);
-        }
 
-        public void Clear()
-        {
+        public void Clear() =>
             Headers.Clear();
-        }
 
-        public void SetHeaders(IEnumerable<string> h)
-        {
+        public void SetHeaders(IEnumerable<string> h) =>
             Headers = HeaderCreator.ParseList(h.ToList());
-        }
 
-        public int GetIndexByHeader(DrawnTableHeader header) => Headers.IndexOf(header);
+        public int GetIndexByHeader(DrawnTableHeader header) =>
+            Headers.IndexOf(header);
 
         public int GetIndexByHeaderText(string headerText)
         {

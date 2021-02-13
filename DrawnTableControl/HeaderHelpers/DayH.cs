@@ -8,7 +8,11 @@ namespace DrawnTableControl.HeaderHelpers
 {
     public class DayH : IHeaderCreator<DateTime, int>
     {
-        public static DateTime GetWeeksMonday(DateTime? dt = null)
+        internal DayH()
+        {
+        }
+
+        public DateTime GetWeeksMonday(DateTime? dt = null)
         {
             if (dt == null)
             {
@@ -18,7 +22,7 @@ namespace DrawnTableControl.HeaderHelpers
             {
                 dt = dt.Value.AddDays(-1);
             }
-            return dt.Value;
+            return dt.Value.Date;
         }
 
         readonly List<DateTime> lastResult = new();
@@ -66,31 +70,23 @@ namespace DrawnTableControl.HeaderHelpers
 
         public DateTime this[int index] => lastResult[index];
 
-        public int GetIndexByValue(DateTime day) => lastResult.IndexOf(day);
+        public int GetIndexByValue(DateTime day) => lastResult.IndexOf(day.Date);
 
-        public int GetNearestIndexByDay(DateTime day, bool isSearchForward)
+        public int GetNearestIndexByDay(DateTime day, Func<DateTime, bool> predicate = null)
         {
-            if (isSearchForward)
+            predicate ??= _ => true;
+
+            var diffs = lastResult.Select((date, index) => new { index, date, diff = Math.Abs((day - date).TotalDays) })
+                .Where(d => predicate(d.date))
+                .ToArray();
+            if (diffs.Length == 0)
             {
-                for (int i = lastResult.Count - 1; i >= 0; i--)
-                {
-                    if (lastResult[i] <= day)
-                    {
-                        return i;
-                    }
-                }
+                return -1;
             }
-            else
-            {
-                for (int i = 0; i < lastResult.Count; i++)
-                {
-                    if (lastResult[i] >= day)
-                    {
-                        return i;
-                    }
-                }
-            }
-            return -1;
+
+            var minDif = diffs.Min(d => d.diff);
+            int nearestIndex = diffs.First(d => d.diff == minDif).index;
+            return nearestIndex;
         }
     }
 }

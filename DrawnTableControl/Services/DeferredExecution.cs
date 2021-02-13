@@ -84,7 +84,8 @@ namespace DrawnTableControl.Services
 #pragma warning restore CS0168
         }
 
-        public bool IsWorking => worker != null && !worker.IsFaulted && isDoingWork;
+        public bool IsWorking =>
+            worker != null && !worker.IsFaulted && isDoingWork;
 
         public void Join()
         {

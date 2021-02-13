@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Windows.Forms;
+using DrawnTableControl.Demo.Models;
 using DrawnTableControl.Enums;
 using DrawnTableControl.EventArguments;
 using DrawnTableControl.HeaderHelpers;
@@ -16,24 +17,76 @@ namespace DrawnTableControl.Demo
     {
         private readonly HeaderCreator headers = new();
 
+        private readonly List<Event> events = new();
+        private readonly IReadOnlyList<Location> locations = new Location[]
+        {
+            new(1, "Room1", Color.PaleVioletRed),
+            new(2, "Room2", Color.LightSeaGreen),
+            new(3, "Room3", Color.ForestGreen)
+        };
+        private readonly  DateTime dayStart;
+        private readonly  DateTime dayEnd;
+
+        private readonly Color weekendColor = Color.FromArgb(75, Color.LightSeaGreen);
+        private readonly Color pastColor = Color.FromArgb(25, Color.Gray);
+
+        enum TStyle 
+        { 
+            None, 
+            DayTime, 
+            LocationTime,
+            DayList 
+        }
+
         public Form1()
         {
             InitializeComponent();
+
+            dayStart = headers.Day.GetWeeksMonday(DateTime.Now);
+            dayEnd = dayStart.AddDays(6);
+
             cbLTGroupBy.SelectedIndex = 0;
         }
 
-        enum TStyle { None, DayTime, LocationTime, DayList }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Font defaultFont = pbDrawnTable.Table.GetDefaultFont();
+            pbDrawnTable.Font = new Font(defaultFont.FontFamily, 10);
+
+            events.AddRange(GenerateEvents(TimeSpan.FromHours(8), TimeSpan.FromHours(18)).Take(6));
+            UpdateTable();
+        }
 
         private void Setting_Changed(object sender, EventArgs e)
         {
             UpdateTable();
         }
 
+        void InitTable(List<DrawnTableHeader> Rows, List<DrawnTableHeader> Cols)
+        {
+            pbDrawnTable.Table.Create(Rows, Cols);
+            pbDrawnTable.Table.CellCreating += Table_CellCreating;
+            pbDrawnTable.Table.CellWithValueClick += Table_CellWithValueClick;
+            pbDrawnTable.Table.CellOverlapPlaceholderClick += Table_CellOverlapPlaceholderClick;
+            pbDrawnTable.Table.CellDragDropFinished += Table_CellDragDropFinished;
+            pbDrawnTable.Table.CellCopied += Table_CellCopied;
+            pbDrawnTable.Table.CellPasted += Table_CellPasted;
+            pbDrawnTable.Table.AllowCreateNewCells = chAllowCreateNewCell.Checked;
+            pbDrawnTable.Table.IfCellsOverlap = DrawnTableOverlapOptions.ReplaceWithCounter;
+            if (chDragDrop.Checked)
+            {
+                pbDrawnTable.Table.AllowDragDrop = true;
+                pbDrawnTable.Table.CellCopyMode = DrawnTableCopyMode.CtrlAndDrag;
+            }
+            else
+            {
+                pbDrawnTable.Table.CellCopyMode = DrawnTableCopyMode.None;
+                pbDrawnTable.Table.AllowDragDrop = false;
+            }
+        }
+
         private void UpdateTable()
         {
-            List<Event> events = new();
-            DateTime dayStart = DateTime.Now;
-            DateTime dayEnd = dayStart.AddDays(6);
             TStyle style = GetStyle();
 
             List<DrawnTableHeader> Rows = null, Cols = null;
@@ -66,11 +119,19 @@ namespace DrawnTableControl.Demo
                 }
             }
 
-
             pbDrawnTable.Table.SuspendRedrawing();
             InitTable(Rows, Cols);
 
-            foreach (var e in events)
+            if (chColorWeekends.Checked)
+            {
+                ColorDateRange(dayStart, dayEnd, dayEnd.AddDays(-1), dayEnd, weekendColor);
+            }
+            if (chColorPast.Checked)
+            {
+                ColorPast(dayStart, dayEnd, pastColor);
+            }
+
+            foreach (var e in events.OrderBy(e => e.Date).ThenBy(e => e.Start))
             {
                 DrawnTableCell cell = CreateCell(e, headers, style);
                 if (cell is null)
@@ -100,53 +161,50 @@ namespace DrawnTableControl.Demo
             return headerFilter.Compile();
         }
 
-        void InitTable(List<DrawnTableHeader> Rows, List<DrawnTableHeader> Cols)
-        {
-            pbDrawnTable.Table.Create(Rows, Cols);
-            pbDrawnTable.Table.CellCreating += Table_CellCreating;
-            pbDrawnTable.Table.CellWithValueClick += Table_CellWithValueClick;
-            pbDrawnTable.Table.CellOverlapPlaceholderClick += Table_CellOverlapPlaceholderClick;
-            pbDrawnTable.Table.CellDragDropFinished += Table_CellDragDropFinished;
-            pbDrawnTable.Table.CellCopied += Table_CellCopied;
-            pbDrawnTable.Table.CellPasted += Table_CellPasted;
-            pbDrawnTable.Table.AllowCreateNewCells = true;
-            pbDrawnTable.Table.AllowDragDrop = true;
-            pbDrawnTable.Table.IfCellsOverlap = DrawnTableOverlapOptions.ReplaceWithCounter;
-            pbDrawnTable.Table.CellCopyMode = DrawnTableCopyMode.CtrlAndDrag;
-        }
-
+        #region Table events
         private void Table_CellPasted(object sender, CellPastedEventArgs e)
         {
-            Event ev = (Event)pbDrawnTable.Table.Cells[e.Location].Value;
-            OpenEventEdit(ev.ID, pbDrawnTable.Table.Cells[e.Location], e.CopiedFrom.Location);
+            UpdateEventBasedOnTableLocation(pbDrawnTable.Table.Cells[e.Location], e.CopiedFrom.Location);
         }
 
         private void Table_CellCopied(object sender, CellCopiedEventArgs e)
         {
-            (e.CopiedCell.Value as Event).ID = -(e.CopiedCell.Value as Event).ID;
+            Event ev = (Event)e.CopiedCell.Value;
+            Event copy = (Event)ev.Clone();
+            events.Add(copy);
+
+            e.CopiedCell.Value = copy;
         }
 
         private void Table_CellDragDropFinished(object sender, CellMovedEventArgs e)
         {
-            object v = pbDrawnTable.Table.Cells[e.Location].Value;
-            if (v is Event ev)
+            object cellValue = pbDrawnTable.Table.Cells[e.Location].Value;
+            if (cellValue is Event)
             {
-                OpenEventEdit(ev.ID, pbDrawnTable.Table.Cells[e.Location], e.OldLocation);
+                UpdateEventBasedOnTableLocation(pbDrawnTable.Table.Cells[e.Location], e.OldLocation);
             }
         }
 
         private void Table_CellWithValueClick(object sender, CellClickEventArgs e)
         {
-            DrawnTableCell cell = pbDrawnTable.Table.Cells[e.Location];
+            DrawnTableCell cell = pbDrawnTable.Table.Cells[e.CellLocation];
             if (e.Button == MouseButtons.Left)
             {
-                if (cell.Value is not Event ev)
+                if (cell.Value is not Event)
                 {
-                    ev = new Event(0, cell.Value.ToString());
+                    // User clicked on "+" cell. Creating new event on its place
+
+                    Event ev = new();
+                    events.Add(ev);
+
                     cell.Value = ev;
                     cell.ResetStyle();
+                    UpdateEventBasedOnTableLocation(cell);
                 }
-                OpenEventEdit(ev.ID, cell);
+                else
+                {
+                    MessageBox.Show("Event clicked");
+                }
             }
             else
             {
@@ -172,9 +230,61 @@ namespace DrawnTableControl.Demo
             cell.Value = value;
         }
 
-        void OpenEventEdit(int eid, DrawnTableCell cell = null, CellLocation? movedFrom = null)
+        private void UpdateEventBasedOnTableLocation(DrawnTableCell cell, CellLocation? movedFrom = null)
         {
+            Event ev = (Event)cell.Value;
 
+            // Obtaining event information based on its location in the table
+            TimeSpan newStart, newEnd;
+            newEnd = newStart = TimeSpan.FromTicks(-1);
+            switch (GetStyle())
+            {
+                case TStyle.DayTime:
+                    ev.Date = headers.Day[cell.Location.Column];
+                    newStart = headers.Time[cell.Location.Row];
+                    newEnd = headers.Time[cell.Location.Row + cell.Rowspan];
+                    break;
+                case TStyle.LocationTime:
+                    newStart = headers.Time[cell.Location.Row];
+                    newEnd = headers.Time[cell.Location.Row + cell.Rowspan];
+                    int lid;
+                    if (cbLTGroupBy.SelectedIndex == 0)
+                    {
+                        var (Header, Subheader) = headers.GetHeadersByRealIndex(headers.Day.LastGeneratedHeaders, cell.Location.Column);
+                        ev.Date = (DateTime)Header.Tag;
+                        lid = (int)Subheader.Tag;
+                    }
+                    else
+                    {
+                        var (Header, Subheader) = headers.GetHeadersByRealIndex(headers.Custom1.Headers, cell.Location.Column);
+                        lid = (int)Header.Tag;
+                        ev.Date = (DateTime)Subheader.Tag;
+                    }
+                    ev.Location = locations.SingleOrDefault(l => l.Id == lid);
+                    break;
+                case TStyle.DayList:
+                    ev.Date = headers.Day[cell.Location.Column];
+                    break;
+                default:
+                    throw new NotSupportedException("Something wrong");
+            }
+
+            if (newStart.Ticks > 0)
+            {
+                if (movedFrom == null)
+                {
+                    ev.Start = newStart;
+                    ev.End = newEnd;
+                }
+                else if (cell.Location.Row != movedFrom.Value.Row)
+                {
+                    TimeSpan duration = ev.End - ev.Start;
+                    ev.Start = newStart;
+                    ev.End = ev.Start + duration;
+                }
+            }
+
+            cell.Value = ev;
         }
 
         private DrawnTableCell CreateCell(Event e, HeaderCreator headers, TStyle style)
@@ -187,26 +297,30 @@ namespace DrawnTableControl.Demo
                     int col = headers.Day.GetIndexByValue(e.Date);
                     double row = headers.Time.GetIndexByValue(e.Start);
                     double rowEnd = headers.Time.GetIndexByValue(e.End);
-                    AdjustCell(ref row, ref rowEnd);
+                    (row, rowEnd) = AdjustCell(row, rowEnd);
                     cell = new DrawnTableCell(new CellLocation((int)row, col), e, (int)rowEnd - (int)row);
                     break;
                 }
                 case TStyle.DayList:
                 {
+                    int row = -1;
                     int col = headers.Day.GetIndexByValue(e.Date);
-                    DrawnTableHeader header = headers.Custom1.Headers.First(h => (int)(h.Tag ?? -1) != col);
-                    header.Tag = col;
-                    int row = int.Parse(header.Text) - 1;
+                    if (col >= 0)
+                    {
+                        DrawnTableHeader header = headers.Custom1.Headers.First(h => (int)(h.Tag ?? -1) != col);
+                        header.Tag = col;
+                        row = int.Parse(header.Text) - 1;
+                    }
                     cell = new DrawnTableCell(new CellLocation(row, col), e);
                     break;
                 }
                 case TStyle.LocationTime:
                 {
-                    if (e.RoomId is null)
+                    if (e.Location is null)
                     {
                         return null;
                     }
-                    int col = GetRoomTimeColumnIndex(e.Date, e.RoomId.Value);
+                    int col = GetLocationTimeColumnIndex(e.Date, e.Location.Id);
                     double rol = headers.Time.GetIndexByValue(e.Start);
                     double rowEnd = headers.Time.GetIndexByValue(e.End);
                     if (Math.Floor(rol) == Math.Ceiling(rowEnd))
@@ -234,77 +348,227 @@ namespace DrawnTableControl.Demo
                     return null;
             }
 
-            cell.Brush = new SolidBrush(e.Color);
+            if (cell.Location.Column < 0 || cell.Location.Column >= pbDrawnTable.Table.ColumnCount()
+                || cell.Location.Row < 0 || cell.Location.Row >= pbDrawnTable.Table.RowCount())
+            {
+                return null;
+            }
+
+            if (e.Color != null)
+            {
+                cell.Brush = new SolidBrush(e.Color.Value);
+            }
             cell.Enabled = e.Enabled;
             return cell;
         }
+        #endregion
 
-        private void AdjustCell(TimeSpan start, TimeSpan end, out int timeFrom, out int timeTo)
+        #region Cell location utils
+        private (int start, int end) AdjustCell(TimeSpan start, TimeSpan end)
         {
-            double _timeFrom = headers.Time.GetIndexByValue(start);
-            double _timeTo = headers.Time.GetIndexByValue(end);
-            _timeFrom = Math.Max(0, _timeFrom);
-            _timeTo = Math.Min(pbDrawnTable.Table.RowCount(), _timeTo);
-            AdjustCell(ref _timeFrom, ref _timeTo);
-
-            timeFrom = (int)_timeFrom;
-            timeTo = (int)_timeTo;
+            double timeFrom = headers.Time.GetIndexByValue(start);
+            double timeTo = headers.Time.GetIndexByValue(end);
+            timeFrom = Math.Max(0, timeFrom);
+            timeTo = Math.Min(pbDrawnTable.Table.RowCount(), timeTo);
+            
+            return AdjustCell(timeFrom, timeTo);
         }
 
-        private static void AdjustCell(ref double start, ref double end)
+        private static (int start, int end) AdjustCell(double start, double end)
         {
             if (Math.Floor(start) == Math.Ceiling(end))
             {
                 if (Math.Round(start) == Math.Round(end))
                 {
-                    start = Math.Ceiling(start);
-                    end = Math.Floor(end);
+                    return ((int)Math.Ceiling(start), (int)Math.Floor(end));
                 }
-                else
-                {
-                    start = Math.Round(start);
-                    end = Math.Round(end);
-                }
+
+                return ((int)Math.Round(start), (int)Math.Round(end));
             }
-            else
-            {
-                start = Math.Floor(start);
-                end = Math.Ceiling(end);
-            }
+
+            return ((int)Math.Floor(start), (int)Math.Ceiling(end));
         }
 
-        private int GetRoomTimeColumnIndex(DateTime day, int roomId)
+        private int GetLocationTimeColumnIndex(DateTime day, int roomId)
         {
             int col;
             if (cbLTGroupBy.SelectedIndex == 0)
             {
-                col = HeaderCreator.GetRealIndex(headers.Day.LastGeneratedHeaders, headers.Day.GetIndexByValue(day), headers.Custom1.GetIndexByHeaderTag(roomId));
+                col = headers.GetRealIndex(headers.Day.LastGeneratedHeaders, headers.Day.GetIndexByValue(day), headers.Custom1.GetIndexByHeaderTag(roomId));
             }
             else
             {
-                col = HeaderCreator.GetRealIndex(headers.Custom1.Headers, headers.Custom1.GetIndexByHeaderTag(roomId), headers.Day.GetIndexByValue(day));
+                col = headers.GetRealIndex(headers.Custom1.Headers, headers.Custom1.GetIndexByHeaderTag(roomId), headers.Day.GetIndexByValue(day));
             }
 
             return col;
         }
+        #endregion
 
-        TStyle GetStyle()
+        #region Color utils
+        private void ColorEvent(DateTime day, TimeSpan start, TimeSpan end, int? locationId, Color color)
         {
-            if (rbDayTime.Checked)
+            TStyle style = GetStyle();
+
+            // Getting row
+            var (timeFrom, timeTo) = AdjustCell(start, end);
+            if (timeFrom >= timeTo) return;
+
+            // Getting column
+            int col = style switch
             {
-                return TStyle.DayTime;
-            }
-            else if (rbDayList.Checked)
+                TStyle.DayTime or TStyle.DayList => headers.Day.GetIndexByValue(day),
+                TStyle.LocationTime when locationId.HasValue => GetLocationTimeColumnIndex(day, locationId.Value),
+                _ => -1
+            };
+            if (col < 0) return;
+
+            // Setting background color
+            for (int i = timeFrom; i < timeTo; i++)
             {
-                return TStyle.DayList;
+                pbDrawnTable.Table.Cells.BackColors[i, col] = color;
             }
-            else if (rbLocationTime.Checked)
-            {
-                return TStyle.LocationTime;
-            }
-            return TStyle.None;
         }
 
+        private void ColorPast(DateTime dayStart, DateTime dayEnd, Color pastColor)
+        {
+            TStyle style = GetStyle();
+
+            if (dayStart > DateTime.Today
+                || pbDrawnTable.Table.RowCount() == 0
+                || pbDrawnTable.Table.ColumnCount() == 0)
+            {
+                return;
+            }
+
+            if (dayEnd < DateTime.Today)
+            {
+                pbDrawnTable.Table.Cells.BackColors.SetAll(pastColor);
+                return;
+            }
+
+            int roomCount = 1;
+            if (style == TStyle.LocationTime && cbLTGroupBy.SelectedIndex == 0)
+            {
+                roomCount = headers.Custom1.Headers.Count;
+            }
+
+            int to = pbDrawnTable.Table.ColumnCount() - 1;
+            int timeTo = pbDrawnTable.Table.RowCount() - 1;
+
+            to = Math.Max(0, headers.Day.GetNearestIndexByDay(DateTime.Today, d => DateTime.Today >= d) * roomCount) - 1;
+            if (style == TStyle.DayTime || style == TStyle.DayList || (style == TStyle.LocationTime && cbLTGroupBy.SelectedIndex == 0))
+            {
+                for (int i = 0; i <= to; i++)
+                {
+                    pbDrawnTable.Table.Cells.BackColors.SetColumn(i, pastColor);
+                }
+
+                if (style == TStyle.DayTime || style == TStyle.LocationTime)
+                {
+                    for (int r = 0; r <= timeTo; r++)
+                    {
+                        TimeSpan time = headers.Time[r + 1];
+                        if (DateTime.Now.TimeOfDay < time)
+                        {
+                            break;
+                        }
+                        for (int i = 1; i <= roomCount; i++)
+                        {
+                            pbDrawnTable.Table.Cells.BackColors[r, to + i] = pastColor;
+                        }
+                    }
+                }
+            }
+            else if (style == TStyle.LocationTime && cbLTGroupBy.SelectedIndex == 1)
+            {
+                int dayCount = headers.Day.LastGeneratedHeaders.Count;
+
+                for (int roomIndex = 0; roomIndex < headers.Custom1.Count; roomIndex++)
+                {
+                    for (int dayIndex = 0; dayIndex <= to; dayIndex++)
+                    {
+                        pbDrawnTable.Table.Cells.BackColors.SetColumn(roomIndex * dayCount + dayIndex, pastColor);
+                    }
+
+                    for (int r = 0; r <= timeTo; r++)
+                    {
+                        TimeSpan time = headers.Time[r + 1];
+                        if (DateTime.Now.TimeOfDay < time)
+                        {
+                            break;
+                        }
+                        pbDrawnTable.Table.Cells.BackColors[r, roomIndex * dayCount + to + 1] = pastColor;
+                    }
+                }
+            }
+        }
+
+        private void ColorDateRange(DateTime dayStart, DateTime dayEnd, DateTime rangeStart, DateTime rangeEnd, Color color)
+        {
+            if (pbDrawnTable.Table.RowCount() == 0 || pbDrawnTable.Table.ColumnCount() == 0)
+            {
+                return;
+            }
+
+            TStyle style = GetStyle();
+
+            int locationCount = 1;
+            if (style == TStyle.LocationTime && cbLTGroupBy.SelectedIndex == 0)
+            {
+                locationCount = headers.Custom1.Headers.Count;
+            }
+            int columnCount = pbDrawnTable.Table.ColumnCount();
+
+            int from = 0, to = columnCount - 1;
+            if (dayStart < rangeStart)
+            {
+                from = headers.Day.GetNearestIndexByDay(rangeStart, d => rangeStart <= d) * locationCount;
+            }
+            if (dayEnd > rangeEnd)
+            {
+                to = headers.Day.GetNearestIndexByDay(rangeEnd, d => rangeEnd >= d) * locationCount + (locationCount - 1);
+            }
+
+            if (from < 0 || to < 0)
+            {
+                return;
+            }
+
+            if (from == 0 && to == columnCount - 1)
+            {
+                pbDrawnTable.Table.Cells.BackColors.SetAll(color);
+                return;
+            }
+
+            if (style == TStyle.LocationTime && cbLTGroupBy.SelectedIndex == 1)
+            {
+                int dayCount = headers.Day.LastGeneratedHeaders.Count;
+
+                if (to == columnCount - 1)
+                {
+                    to = dayCount - 1;
+                }
+
+                for (int roomIndex = 0; roomIndex < headers.Custom1.Count; roomIndex++)
+                {
+                    for (int dayIndex = from; dayIndex <= to; dayIndex++)
+                    {
+                        pbDrawnTable.Table.Cells.BackColors.SetColumn(roomIndex * dayCount + dayIndex, color);
+                    }
+                }
+            }
+            else
+            {
+                for (int i = from; i <= to; i++)
+                {
+                    pbDrawnTable.Table.Cells.BackColors.SetColumn(i, color);
+                }
+            }
+        }
+        #endregion
+
+        #region Printing
         private void bPrint_Click(object sender, EventArgs e)
         {
             PrintDialog printDialog = new()
@@ -349,6 +613,55 @@ namespace DrawnTableControl.Demo
 
             // Print table
             pbDrawnTable.Table.Printing.PrintPaint(g, area);
+        }
+        #endregion
+
+        TStyle GetStyle()
+        {
+            if (rbDayTime.Checked)
+            {
+                return TStyle.DayTime;
+            }
+            else if (rbDayList.Checked)
+            {
+                return TStyle.DayList;
+            }
+            else if (rbLocationTime.Checked)
+            {
+                return TStyle.LocationTime;
+            }
+            return TStyle.None;
+        }
+
+        private IEnumerable<Event> GenerateEvents(TimeSpan timeFrom, TimeSpan timeTo)
+        {
+            TimeSpan durationFrom = TimeSpan.FromHours(1), durationTo = TimeSpan.FromHours(3);
+
+            Random r = new();
+            int dayRange = (dayEnd - dayStart).Days;
+            int startRange = (int)(timeTo - timeFrom).TotalMinutes;
+            int durationRange = (int)(durationTo - durationFrom).TotalMinutes;
+            int locationRange = locations.Count;
+
+            while (true)
+            {
+                TimeSpan start = timeFrom.Add(TimeSpan.FromMinutes(r.Next(startRange)));
+                Event ev = new()
+                {
+                    Date = dayStart.AddDays(r.Next(dayRange)).Date,
+                    Start = start,
+                    End = start.Add(durationFrom.Add(TimeSpan.FromMinutes(r.Next(durationRange)))),
+                    Enabled = r.Next(100) < 70
+                };
+
+                int locationIndex = r.Next(locationRange + 1);
+                if (locationIndex != locationRange)
+                {
+                    ev.Location = locations[locationIndex];
+                }
+
+                yield return ev;
+            }
         }
     }
 }

@@ -19,9 +19,7 @@ namespace DrawnTableControl.Models
 
         internal DrawnTableCells(DrawnTable table)
         {
-            _ = table ?? throw new ArgumentNullException(nameof(table));
-
-            this.table = table;
+            this.table = table ?? throw new ArgumentNullException(nameof(table));
             lastId = 0;
             cells = new List<DrawnTableCell>();
             cellsArea = new Dictionary<int, RectangleF>();
@@ -34,9 +32,9 @@ namespace DrawnTableControl.Models
             return ++lastId;
         }
 
-        public bool Contains(DrawnTableCell Cell)
+        public bool Contains(DrawnTableCell cell)
         {
-            return cells.Contains(Cell);
+            return cells.Contains(cell);
         }
 
         public int Count
@@ -45,38 +43,38 @@ namespace DrawnTableControl.Models
         }
 
         #region Area
-        internal RectangleF GetArea(DrawnTableCell Cell)
+        internal RectangleF GetArea(DrawnTableCell cell)
         {
-            if (Cell.Table != table)
+            if (cell.Table != table)
             {
                 throw new ArgumentException("Tables must be the same");
             }
-            return cellsArea[Cell.innerId];
+            return cellsArea[cell.innerId];
         }
 
-        internal void UpdateArea(DrawnTableCell Cell)
+        internal void UpdateArea(DrawnTableCell cell)
         {
-            if (Cell.Table != table || !Contains(Cell))
+            if (cell.Table != table || !Contains(cell))
             {
                 throw new ArgumentException("This cell doesn't exists in this table");
             }
 
-            RectangleF oldArea = cellsArea[Cell.innerId];
-            cellsArea[Cell.innerId] = table.DrawCell(Cell);
-            if (cellsArea[Cell.innerId] != oldArea)
+            RectangleF oldArea = cellsArea[cell.innerId];
+            cellsArea[cell.innerId] = table.DrawCell(cell);
+            if (cellsArea[cell.innerId] != oldArea)
             {
                 table.Redraw();
             }
         }
 
-        internal void UpdateArea(DrawnTableCell Cell, RectangleF NewArea)
+        internal void UpdateArea(DrawnTableCell cell, RectangleF newArea)
         {
-            if (Cell.Table != table || !Contains(Cell))
+            if (cell.Table != table || !Contains(cell))
             {
                 throw new ArgumentException("This cell doesn't exists in this table");
             }
 
-            cellsArea[Cell.innerId] = NewArea;
+            cellsArea[cell.innerId] = newArea;
         }
         #endregion
 
@@ -93,8 +91,9 @@ namespace DrawnTableControl.Models
         {
             if (!table.IsEnabled)
             {
-                throw new InvalidOperationException("Table mast be created first");
+                throw new InvalidOperationException($"Table must be initialized first. Call {nameof(DrawnTable.Create)} to create the table.");
             }
+
             if (cell.Table != table)
             {
                 cell.Table = table;
@@ -102,6 +101,12 @@ namespace DrawnTableControl.Models
             else
             {
                 throw new ArgumentException("This cell is already added to this table", nameof(cell));
+            }
+
+            if (cell.Location.Column < 0 || cell.Location.Column >= cell.Table.ColumnCount()
+                || cell.Location.Row < 0 || cell.Location.Row >= cell.Table.RowCount())
+            {
+                throw new ArgumentException("Cell location is out of bounds.", nameof(cell));
             }
 
             List<DrawnTableCell> oCells = GetOverlap(cell);

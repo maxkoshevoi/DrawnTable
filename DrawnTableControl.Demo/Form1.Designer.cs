@@ -47,10 +47,18 @@ namespace DrawnTableControl.Demo
             this.gWeekDays = new System.Windows.Forms.GroupBox();
             this.bPrint = new System.Windows.Forms.Button();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.chColorPast = new System.Windows.Forms.CheckBox();
+            this.chColorWeekends = new System.Windows.Forms.CheckBox();
+            this.chDragDrop = new System.Windows.Forms.CheckBox();
+            this.chAllowCreateNewCell = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbDrawnTable)).BeginInit();
             this.pViewDays.SuspendLayout();
             this.gLayout.SuspendLayout();
             this.gWeekDays.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // pbDrawnTable
@@ -61,14 +69,14 @@ namespace DrawnTableControl.Demo
             this.pbDrawnTable.Image = null;
             this.pbDrawnTable.Location = new System.Drawing.Point(220, 12);
             this.pbDrawnTable.Name = "pbDrawnTable";
-            this.pbDrawnTable.Size = new System.Drawing.Size(891, 520);
+            this.pbDrawnTable.Size = new System.Drawing.Size(891, 534);
             this.pbDrawnTable.TabIndex = 0;
             this.pbDrawnTable.TabStop = false;
             // 
             // chHideEmptyColumns
             // 
             this.chHideEmptyColumns.AutoSize = true;
-            this.chHideEmptyColumns.Location = new System.Drawing.Point(13, 322);
+            this.chHideEmptyColumns.Location = new System.Drawing.Point(13, 372);
             this.chHideEmptyColumns.Name = "chHideEmptyColumns";
             this.chHideEmptyColumns.Size = new System.Drawing.Size(137, 19);
             this.chHideEmptyColumns.TabIndex = 3;
@@ -86,9 +94,10 @@ namespace DrawnTableControl.Demo
             this.pViewDays.Controls.Add(this.chViewDaysSa);
             this.pViewDays.Controls.Add(this.chViewDaysSu);
             this.pViewDays.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pViewDays.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.pViewDays.Location = new System.Drawing.Point(3, 19);
             this.pViewDays.Name = "pViewDays";
-            this.pViewDays.Size = new System.Drawing.Size(131, 177);
+            this.pViewDays.Size = new System.Drawing.Size(195, 177);
             this.pViewDays.TabIndex = 4;
             // 
             // chViewDaysMd
@@ -208,6 +217,7 @@ namespace DrawnTableControl.Demo
             "Day",
             "Location"});
             this.cbLTGroupBy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbLTGroupBy.Enabled = false;
             this.cbLTGroupBy.FormattingEnabled = true;
             this.cbLTGroupBy.Items.AddRange(new object[] {
             "Day",
@@ -221,6 +231,7 @@ namespace DrawnTableControl.Demo
             // rbLocationTime
             // 
             this.rbLocationTime.AutoSize = true;
+            this.rbLocationTime.Enabled = false;
             this.rbLocationTime.Location = new System.Drawing.Point(6, 72);
             this.rbLocationTime.Name = "rbLocationTime";
             this.rbLocationTime.Size = new System.Drawing.Size(108, 19);
@@ -258,7 +269,7 @@ namespace DrawnTableControl.Demo
             this.gWeekDays.Controls.Add(this.pViewDays);
             this.gWeekDays.Location = new System.Drawing.Point(13, 117);
             this.gWeekDays.Name = "gWeekDays";
-            this.gWeekDays.Size = new System.Drawing.Size(137, 199);
+            this.gWeekDays.Size = new System.Drawing.Size(201, 199);
             this.gWeekDays.TabIndex = 6;
             this.gWeekDays.TabStop = false;
             this.gWeekDays.Text = "Week days to display";
@@ -266,7 +277,7 @@ namespace DrawnTableControl.Demo
             // bPrint
             // 
             this.bPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.bPrint.Location = new System.Drawing.Point(12, 509);
+            this.bPrint.Location = new System.Drawing.Point(12, 523);
             this.bPrint.Name = "bPrint";
             this.bPrint.Size = new System.Drawing.Size(196, 23);
             this.bPrint.TabIndex = 7;
@@ -278,11 +289,85 @@ namespace DrawnTableControl.Demo
             // 
             this.printDocument1.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.printDocument1_PrintPage);
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.flowLayoutPanel1);
+            this.groupBox1.Location = new System.Drawing.Point(10, 404);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(195, 74);
+            this.groupBox1.TabIndex = 8;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Style";
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Controls.Add(this.chColorPast);
+            this.flowLayoutPanel1.Controls.Add(this.chColorWeekends);
+            this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 19);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(189, 52);
+            this.flowLayoutPanel1.TabIndex = 3;
+            // 
+            // chColorPast
+            // 
+            this.chColorPast.AutoSize = true;
+            this.chColorPast.Location = new System.Drawing.Point(3, 3);
+            this.chColorPast.Name = "chColorPast";
+            this.chColorPast.Size = new System.Drawing.Size(80, 19);
+            this.chColorPast.TabIndex = 2;
+            this.chColorPast.Text = "Color past";
+            this.chColorPast.UseVisualStyleBackColor = true;
+            this.chColorPast.CheckedChanged += new System.EventHandler(this.Setting_Changed);
+            // 
+            // chColorWeekends
+            // 
+            this.chColorWeekends.AutoSize = true;
+            this.chColorWeekends.Checked = true;
+            this.chColorWeekends.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chColorWeekends.Location = new System.Drawing.Point(3, 28);
+            this.chColorWeekends.Name = "chColorWeekends";
+            this.chColorWeekends.Size = new System.Drawing.Size(110, 19);
+            this.chColorWeekends.TabIndex = 1;
+            this.chColorWeekends.Text = "Color weekends";
+            this.chColorWeekends.UseVisualStyleBackColor = true;
+            this.chColorWeekends.CheckedChanged += new System.EventHandler(this.Setting_Changed);
+            // 
+            // chDragDrop
+            // 
+            this.chDragDrop.AutoSize = true;
+            this.chDragDrop.Checked = true;
+            this.chDragDrop.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chDragDrop.Location = new System.Drawing.Point(13, 322);
+            this.chDragDrop.Name = "chDragDrop";
+            this.chDragDrop.Size = new System.Drawing.Size(141, 19);
+            this.chDragDrop.TabIndex = 9;
+            this.chDragDrop.Text = "Enable Drag and Drop";
+            this.chDragDrop.UseVisualStyleBackColor = true;
+            this.chDragDrop.CheckedChanged += new System.EventHandler(this.Setting_Changed);
+            // 
+            // chAllowCreateNewCell
+            // 
+            this.chAllowCreateNewCell.AutoSize = true;
+            this.chAllowCreateNewCell.Checked = true;
+            this.chAllowCreateNewCell.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chAllowCreateNewCell.Location = new System.Drawing.Point(13, 347);
+            this.chAllowCreateNewCell.Name = "chAllowCreateNewCell";
+            this.chAllowCreateNewCell.Size = new System.Drawing.Size(142, 19);
+            this.chAllowCreateNewCell.TabIndex = 10;
+            this.chAllowCreateNewCell.Text = "Allow create new cells";
+            this.chAllowCreateNewCell.UseVisualStyleBackColor = true;
+            this.chAllowCreateNewCell.CheckedChanged += new System.EventHandler(this.Setting_Changed);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1123, 544);
+            this.ClientSize = new System.Drawing.Size(1123, 558);
+            this.Controls.Add(this.chAllowCreateNewCell);
+            this.Controls.Add(this.chDragDrop);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.bPrint);
             this.Controls.Add(this.gWeekDays);
             this.Controls.Add(this.gLayout);
@@ -291,12 +376,16 @@ namespace DrawnTableControl.Demo
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DrawnTableControl.Demo";
+            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbDrawnTable)).EndInit();
             this.pViewDays.ResumeLayout(false);
             this.pViewDays.PerformLayout();
             this.gLayout.ResumeLayout(false);
             this.gLayout.PerformLayout();
             this.gWeekDays.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.flowLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -322,6 +411,12 @@ namespace DrawnTableControl.Demo
         private System.Windows.Forms.ComboBox cbLTGroupBy;
         private System.Windows.Forms.Button bPrint;
         private System.Drawing.Printing.PrintDocument printDocument1;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.CheckBox chColorWeekends;
+        private System.Windows.Forms.CheckBox chDragDrop;
+        private System.Windows.Forms.CheckBox chAllowCreateNewCell;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+        private System.Windows.Forms.CheckBox chColorPast;
     }
 }
 
