@@ -17,7 +17,7 @@ namespace DrawnTableControl
         /// <summary>
         /// Maximum redrawing frequency of the element. 60 = 60 times per second
         /// </summary>
-        public int RefreshRate { get; private set; } = 60;
+        public int RefreshRate { get; } = 60;
         public bool ShowToolTip { get; set; } = true;
         private bool allowDragDrop = false;
         public bool AllowDragDrop
@@ -27,7 +27,7 @@ namespace DrawnTableControl
             {
                 if (allowDragDrop == value) return;
 
-                if (CellCopyMode == DrawnTableCopyMode.CtrlAndDrag && value == true)
+                if (CellCopyMode == DrawnTableCopyMode.CtrlAndDrag && value)
                 {
                     throw new InvalidOperationException($"Selected {nameof(CellCopyMode)} option require CellDragDrop. Change {nameof(CellCopyMode)} to something else first.");
                 }
@@ -35,11 +35,11 @@ namespace DrawnTableControl
             }
         }
         public bool AllowCreateNewCells { get; set; } = false;
-        public DrawnTableOverlapOptions ifCellsOverlap = DrawnTableOverlapOptions.ThrowError;
+        private DrawnTableOverlapOptions ifCellsOverlap = DrawnTableOverlapOptions.ThrowError;
         /// <summary>
-        /// Attention! This option allow cell to be overlaped by another cell been added via AddCell method only.
-        /// If option "Hide" is chosen, once cells overlaped each other they got removed from table and basicly became inpossible to interact with.
-        /// If option "Merge" is chosen, once cells overlaped each other their values need to be merged manualy by CellsMerging event.
+        /// Attention! This option allow cell to be overlapped by another cell been added via AddCell method only.
+        /// If option "Hide" is chosen, once cells overlapped each other they got removed from table and basicly became impossible to interact with.
+        /// If option "Merge" is chosen, once cells overlapped each other their values need to be merged manually by CellsMerging event.
         /// </summary>
         public DrawnTableOverlapOptions IfCellsOverlap
         {
@@ -49,21 +49,25 @@ namespace DrawnTableControl
                 if (ifCellsOverlap == value) return;
 
                 ifCellsOverlap = value;
-                if (ifCellsOverlap == DrawnTableOverlapOptions.ThrowError || ifCellsOverlap == DrawnTableOverlapOptions.Merge)
+                
+                if (ifCellsOverlap != DrawnTableOverlapOptions.ThrowError &&
+                    ifCellsOverlap != DrawnTableOverlapOptions.Merge)
                 {
-                    foreach (var cell in Cells)
+                    return;
+                }
+
+                foreach (var cell in Cells)
+                {
+                    if (cell is not DrawnTableCellsOverlap)
                     {
-                        if (cell is DrawnTableCellsOverlap)
-                        {
-                            if (ifCellsOverlap == DrawnTableOverlapOptions.ThrowError)
-                            {
-                                throw new InvalidOperationException("There are still overlapping cells");
-                            }
-                            else if (ifCellsOverlap == DrawnTableOverlapOptions.Merge)
-                            {
-                                throw new InvalidOperationException("Hidden cells cannot be merged =(");
-                            }
-                        }
+                        continue;
+                    }
+                    switch (ifCellsOverlap)
+                    {
+                        case DrawnTableOverlapOptions.ThrowError:
+                            throw new InvalidOperationException("There are still overlapping cells");
+                        case DrawnTableOverlapOptions.Merge:
+                            throw new InvalidOperationException("Hidden cells cannot be merged =(");
                     }
                 }
             }
@@ -110,11 +114,12 @@ namespace DrawnTableControl
         //public int CellMargin { get; set; } = 2;
 
         internal Bitmap table { get; private set; }
+
         readonly PBDrawnTable Owner;
         internal DeferredExecution dRedrawEx;
         internal bool isRedrawingSuspended = false;
 
-        public PrintingManager Printing { get; private set; }
+        public PrintingManager Printing { get; }
         #endregion
 
         #region Events
@@ -181,8 +186,8 @@ namespace DrawnTableControl
         {
             if (IsEnabled) Remove();
 
-            RowHeaders = rows;
-            ColumnHeaders = cols;
+            RowHeaders = rows ?? throw new ArgumentNullException(nameof(rows));
+            ColumnHeaders = cols ?? throw new ArgumentNullException(nameof(cols));
             Cells = new DrawnTableCells(this);
 
             TableArea = GetDefaultArea();
@@ -196,12 +201,12 @@ namespace DrawnTableControl
         {
             IsEnabled = false;
             Cells = null;
+            table?.Dispose();
             table = null;
             Owner.mouseDown = false;
 
             if (!isRedrawingSuspended)
             {
-                Owner.Image?.Dispose();
                 Owner.Image = null;
             }
 
@@ -257,7 +262,7 @@ namespace DrawnTableControl
             dRedrawEx.Execute(() => ActualRedraw());
         }
 
-        void ActualRedraw(RectangleF area = default)
+        private void ActualRedraw(RectangleF area = default)
         {
             if (isRedrawingSuspended) return;
 
@@ -272,7 +277,6 @@ namespace DrawnTableControl
             ActualRedraw(g, area);
 
             g.Dispose();
-            Owner.Image?.Dispose();
             Owner.Image = img;
         }
 
@@ -288,6 +292,7 @@ namespace DrawnTableControl
                 if (table == null || TableArea.Size != area.Size)
                 {
                     TableArea = area;
+                    table?.Dispose();
                     table = RedrawBackground();
                 }
                 else
@@ -318,12 +323,9 @@ namespace DrawnTableControl
             {
                 Owner.Invoke(new Action(() =>
                 {
-                    foreach (var cell in currCells.Keys)
+                    foreach (var cell in currCells.Keys.Where(cell => Cells.Contains(cell)))
                     {
-                        if (Cells.Contains(cell))
-                        {
-                            Cells.UpdateArea(cell, currCells[cell]);
-                        }
+                        Cells.UpdateArea(cell, currCells[cell]);
                     }
                 }));
             }
@@ -369,9 +371,14 @@ namespace DrawnTableControl
             return img;
         }
 
-        private void DrawTable(Graphics g, SizeF size, IEnumerable<DrawnTableHeader> cols, IEnumerable<DrawnTableHeader> rows, Font font)
+        private void DrawTable(Graphics g, SizeF size, List<DrawnTableHeader> cols, List<DrawnTableHeader> rows, Font font)
         {
-            int div = 1;
+            if (cols.Count == 0 || rows.Count == 0)
+            {
+                return;
+            }
+
+            const int div = 1;
             float colHeaderH = cols.Max(c => TextRenderer.MeasureText(c.Text, font).Height);
             float rowHeaderW = rows.Max(r => TextRenderer.MeasureText(r.Text, font).Width);
             colHeaderH *= 1.5f;
@@ -411,20 +418,22 @@ namespace DrawnTableControl
                 }
                 x += W;
 
-                if (hasSubheaders)
+                if (!hasSubheaders)
                 {
-                    g.DrawLine(new Pen(BorderColor), new PointF(subheaderX, colHeaderH), new PointF(x, colHeaderH));
-                    foreach (DrawnTableSubheader subcol in col.Subheaders)
+                    continue;
+                }
+
+                g.DrawLine(new Pen(BorderColor), new PointF(subheaderX, colHeaderH), new PointF(x, colHeaderH));
+                foreach (DrawnTableSubheader subcol in col.Subheaders)
+                {
+                    g.DrawLine(new Pen(BorderColor), new PointF(subheaderX, colHeaderH), new PointF(subheaderX, size.Height));
+                    subheaderX++;
+                    W = (colW + 1) * subcol.Span - 1;
+                    if (!string.IsNullOrEmpty(subcol.Text))
                     {
-                        g.DrawLine(new Pen(BorderColor), new PointF(subheaderX, colHeaderH), new PointF(subheaderX, size.Height));
-                        subheaderX++;
-                        W = (colW + 1) * subcol.Span - 1;
-                        if (!string.IsNullOrEmpty(subcol.Text))
-                        {
-                            g.DrawString(subcol.Text, font, new SolidBrush(subcol.ForeColor), new RectangleF(subheaderX, colHeaderH, W, colSubheaderH), subcol.format);
-                        }
-                        subheaderX += W;
+                        g.DrawString(subcol.Text, font, new SolidBrush(subcol.ForeColor), new RectangleF(subheaderX, colHeaderH, W, colSubheaderH), subcol.format);
                     }
+                    subheaderX += W;
                 }
             }
             foreach (DrawnTableHeader row in rows)
@@ -484,17 +493,15 @@ namespace DrawnTableControl
         }
         internal static RectangleF DrawCell(string text, Font font, Brush brush, RectangleF area, StringFormat format = null, Graphics g = null)
         {
-            int padding = 2;
+            const int padding = 2;
 
             RectangleF res = area;
-            if (g != null)
-            {
-                g.FillRectangle(brush, area);
-            }
-            if (format == null)
-            {
-                format = new StringFormat() { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near };
-            }
+            g?.FillRectangle(brush, area);
+            format ??= new StringFormat() 
+            { 
+                Alignment = StringAlignment.Near, 
+                LineAlignment = StringAlignment.Near 
+            };
             format.Trimming = StringTrimming.Character;
 
             area.X += padding;
@@ -502,9 +509,9 @@ namespace DrawnTableControl
             area.Height -= padding * 2;
             area.Width -= padding * 2;
 
-            if (g != null && area.Width > 0 && area.Height > 0)
+            if (area.Width > 0 && area.Height > 0)
             {
-                g.DrawString(text, font, Brushes.White, area, format);
+                g?.DrawString(text, font, Brushes.White, area, format);
             }
             return res;
         }
@@ -517,10 +524,7 @@ namespace DrawnTableControl
             {
                 return new RectangleF(x, y, ColumnWidth, RowHeight);
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         internal RectangleF GetCellArea(CellLocation cellLocation) => GetCellArea(cellLocation.Row, cellLocation.Column);
@@ -532,37 +536,52 @@ namespace DrawnTableControl
             foreach (DrawnTableHeader colH in ColumnHeaders)
             {
                 col -= colH.Span;
-                if (col < 0)
+                if (col >= 0)
                 {
-                    col++;
-                    if (col == 0)
-                    {
-                        area.Width = (int)area.Width;
-                    }
-                    else
-                    {
-                        area.Width++;
-                    }
-                    break;
+                    continue;
                 }
+
+                col++;
+                if (col == 0)
+                {
+                    area.Width = (int)area.Width;
+                }
+                else
+                {
+                    area.Width++;
+                }
+                break;
             }
 
             foreach (DrawnTableHeader rowH in RowHeaders)
             {
                 row -= rowH.Span;
-                if (row < 0)
+                if (row >= 0)
                 {
-                    row++;
-                    if (row == 0)
-                    {
-                        area.Height = (int)area.Height;
-                    }
-                    else
-                    {
-                        area.Height++;
-                    }
-                    break;
+                    continue;
                 }
+
+                row++;
+                if (row == 0)
+                {
+                    area.Height = (int)area.Height;
+                }
+                else
+                {
+                    area.Height++;
+                }
+                break;
+            }
+
+            // Correcting if cell went out of bounds
+            if (CellsArea.Top > area.Top)
+            {
+                area.Height -= (CellsArea.Top - area.Top);
+                area.Y = CellsArea.Top;
+            }
+            if (CellsArea.Bottom < area.Bottom)
+            {
+                area.Height -= (area.Bottom - CellsArea.Bottom);
             }
 
             return area;
@@ -618,7 +637,6 @@ namespace DrawnTableControl
             }
             else
             {
-                Owner.Image?.Dispose();
                 Owner.Image = null;
             }
         }

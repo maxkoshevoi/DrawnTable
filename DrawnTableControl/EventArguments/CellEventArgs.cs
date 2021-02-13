@@ -8,15 +8,14 @@ namespace DrawnTableControl.EventArguments
         /// <summary>
         /// Initializes a new instance of the CellEventArgs class. 
         /// </summary>
-        public CellEventArgs(CellLocation location) : base()
+        public CellEventArgs(CellLocation location)
         {
             Location = location;
         }
 
-        private CellLocation location;
         /// <summary>
         /// Location of cell that caused the event.
         /// </summary>
-        public CellLocation Location { get => location; private set => location = value; }
+        public CellLocation Location { get; }
     }
 }

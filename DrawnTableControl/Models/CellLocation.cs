@@ -2,8 +2,8 @@
 {
     public struct CellLocation
     {
-        public int Row { get; private set; }
-        public int Column { get; private set; }
+        public int Row { get; }
+        public int Column { get; }
 
         public CellLocation(int row, int col)
         {
@@ -20,7 +20,11 @@
         public static bool operator !=(CellLocation one, CellLocation other) => !(one == other);
         public override bool Equals(object obj)
         {
-            return obj is CellLocation location ? location == this : base.Equals(obj);
+            if (obj is CellLocation location)
+            {
+                return location == this;
+            }
+            return base.Equals(obj);
         }
         public override int GetHashCode()
         {

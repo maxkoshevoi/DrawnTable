@@ -8,16 +8,15 @@ namespace DrawnTableControl.EventArguments
         /// <summary>
         /// Initializes a new instance of the CellEventArgs class. 
         /// </summary>
-        /// <param name="e">An ordinary <see cref="MouseEventArguments"/> argument to be extended.</param>
+        /// <param name="e">An ordinary <see cref="MouseEventArgs"/> argument to be extended.</param>
         internal CellClickEventArgs(MouseEventArgs e, CellLocation location) : base(e.Button, e.Clicks, e.X, e.Y, e.Delta)
         {
             CellLocation = location;
         }
 
-        private CellLocation location;
         /// <summary>
         /// Location of cell that caused the event.
         /// </summary>
-        public CellLocation CellLocation { get => location; private set => location = value; }
+        public CellLocation CellLocation { get; }
     }
 }

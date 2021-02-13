@@ -11,7 +11,6 @@ namespace DrawnTableControl.EventArguments
             OverlappingCells = overlappingCells;
         }
 
-        private List<DrawnTableCell> overlappingCells;
-        public List<DrawnTableCell> OverlappingCells { get => overlappingCells; private set => overlappingCells = value; }
+        public List<DrawnTableCell> OverlappingCells { get; }
     }
 }

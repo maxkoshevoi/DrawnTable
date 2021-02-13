@@ -6,7 +6,7 @@ namespace DrawnTableControl.Models
 {
     public class DrawnTableCellsOverlap : DrawnTableCell
     {
-        public new List<DrawnTableCell> Value { get; private set; }
+        public new List<DrawnTableCell> Value { get; }
 
         internal DrawnTableCellsOverlap(CellLocation location, List<DrawnTableCell> value, int rowspan = 1, DrawnTable table = null) : base(location, null, rowspan, table)
         {

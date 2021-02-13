@@ -9,7 +9,6 @@ namespace DrawnTableControl.EventArguments
             OldLocation = oldLocation;
         }
 
-        private CellLocation? oldLocation;
-        public CellLocation? OldLocation { get => oldLocation; private set => oldLocation = value; }
+        public CellLocation? OldLocation { get; }
     }
 }

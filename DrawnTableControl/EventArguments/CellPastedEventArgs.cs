@@ -9,6 +9,6 @@ namespace DrawnTableControl.EventArguments
             CopiedFrom = copiedFrom;
         }
 
-        public DrawnTableCell CopiedFrom { get; private set; }
+        public DrawnTableCell CopiedFrom { get; }
     }
 }

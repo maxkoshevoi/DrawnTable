@@ -12,17 +12,16 @@ namespace DrawnTableControl.Services
         private PrintDocument printDocument;
         public PrintDocument PrintDocument
         {
-            set
-            {
-                printDocument = value;
-            }
+            set => printDocument = value;
             get
             {
                 if (printDocument == null)
                 {
-                    printDocument = new PrintDocument();
-                    printDocument.DefaultPageSettings.Landscape = true;
-                    printDocument.PrintPage += new PrintPageEventHandler(OnPrintPage);
+                    printDocument = new PrintDocument
+                    {
+                        DefaultPageSettings = { Landscape = true }
+                    };
+                    printDocument.PrintPage += OnPrintPage;
                 }
                 return printDocument;
             }
@@ -110,7 +109,7 @@ namespace DrawnTableControl.Services
                 {
                     Rectangle position = ev.MarginBounds;
 
-                    // Draw chart on the printer graphisc
+                    // Draw chart on the printer graphics
                     PrintPaint(ev.Graphics, position);
                 }
                 finally

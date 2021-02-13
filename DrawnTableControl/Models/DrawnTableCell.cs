@@ -51,7 +51,7 @@ namespace DrawnTableControl.Models
                 if (rowspan == value) return;
                 if (value < 1)
                 {
-                    throw new ArgumentOutOfRangeException($"{nameof(Rowspan)} cannot by less than 1");
+                    throw new ArgumentOutOfRangeException($"{nameof(Rowspan)} cannot be less than 1");
                 }
 
                 rowspan = value;
@@ -146,7 +146,11 @@ namespace DrawnTableControl.Models
 
         public override bool Equals(object obj)
         {
-            return obj is DrawnTableCell cell ? cell == this : base.Equals(obj);
+            if (obj is DrawnTableCell cell)
+            {
+                return cell == this;
+            }
+            return base.Equals(obj);
         }
 
         public override int GetHashCode()
@@ -164,9 +168,9 @@ namespace DrawnTableControl.Models
             {
                 clone.table = null;
             }
-            if (value is ICloneable)
+            if (value is ICloneable cloneableValue)
             {
-                clone.Value = (value as ICloneable).Clone();
+                clone.Value = cloneableValue.Clone();
             }
 
             isCloning = false;

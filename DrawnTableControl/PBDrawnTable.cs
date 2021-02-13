@@ -15,9 +15,9 @@ namespace DrawnTableControl
     [DesignerCategory("code")]
     public class PBDrawnTable : PictureBox
     {
-        public DrawnTable Table { get; private set; }
+        public DrawnTable Table { get; }
 
-        public PBDrawnTable() : base()
+        public PBDrawnTable()
         {
             Table = new DrawnTable(this);
             toolTip = new ToolTip();
@@ -36,8 +36,11 @@ namespace DrawnTableControl
         {
             if (Table.IsEnabled)
             {
-                toolTip.Tag = null;
-                toolTip.Hide(this);
+                if (toolTip.Tag != null && !IsInArea((RectangleF)toolTip.Tag, PointToClient(Cursor.Position)))
+                {
+                    toolTip.Tag = null;
+                    toolTip.Hide(this);
+                }
             }
             base.OnMouseLeave(e);
         }
@@ -89,7 +92,10 @@ namespace DrawnTableControl
                         Table.dRedrawEx.Join();
                         Table.dRedrawEx.Pause();
 
-                        dragBackground = (Bitmap)Table.table.Clone();
+                        lock (Table.table)
+                        {
+                            dragBackground = (Bitmap)Table.table.Clone();
+                        }
                         Graphics g = GetGraphics(dragBackground);
 
                         // Drawing back colors
@@ -245,38 +251,35 @@ namespace DrawnTableControl
                         toolTip.Tag = null;
                         toolTip.Hide(this);
                     }
-                    else if (Table.ShowToolTip && toolTip.Tag == null)
+                    else if (Table.ShowToolTip && toolTip.Tag == null && cellUnder != null)
                     {
-                        if (cellUnder != null)
+                        Task.Factory.StartNew(() =>
                         {
-                            Task.Factory.StartNew(() =>
+                            string tipText = cellUnder.ToString();
+                            if (cellUnder is DrawnTableCellsOverlap cellUnderOverlap)
                             {
-                                string tipText = cellUnder.ToString();
-                                if (cellUnder is DrawnTableCellsOverlap)
+                                tipText = "";
+                                foreach (DrawnTableCell cell in cellUnderOverlap.Value)
                                 {
-                                    tipText = "";
-                                    foreach (DrawnTableCell cell in (cellUnder as DrawnTableCellsOverlap).Value)
-                                    {
-                                        tipText += cell.ToString() + "\r\n\r\n";
-                                    }
+                                    tipText += cell + "\r\n\r\n";
                                 }
-                                if (string.IsNullOrEmpty(tipText)) return;
-                                Thread.Sleep(500);
-                                try
+                            }
+                            if (string.IsNullOrEmpty(tipText)) return;
+                            Thread.Sleep(500);
+                            try
+                            {
+                                if (mouseDown == true || toolTip.Tag != null) return;
+                                Invoke((MethodInvoker)delegate
                                 {
-                                    if (mouseDown == true || toolTip.Tag != null) return;
-                                    Invoke((MethodInvoker)delegate
-                                    {
-                                        Point posNew = CursorPosition();
-                                        if (cellUnder != Table.Cells[posNew]) return;
-                                        RectangleF lPos = cellUnder.Area;
-                                        toolTip.Tag = lPos;
-                                        toolTip.Show(tipText, this, new Point((int)lPos.Left + 5, (int)lPos.Bottom + 5), int.MaxValue);
-                                    });
-                                }
-                                catch { }
-                            });
-                        }
+                                    Point posNew = CursorPosition();
+                                    if (cellUnder != Table.Cells[posNew]) return;
+                                    RectangleF lPos = cellUnder.Area;
+                                    toolTip.Tag = lPos;
+                                    toolTip.Show(tipText, this, new Point((int)lPos.Left + 5, (int)lPos.Bottom + 5), int.MaxValue);
+                                });
+                            }
+                            catch { }
+                        });
                     }
                 }
                 else
@@ -340,18 +343,14 @@ namespace DrawnTableControl
 
         private void RedrawCellDrag(MouseEventArgs e)
         {
-            RectangleF area;
-            if (Table.Cells.Contains(interactWith))
-            {
-                area = interactWith.Area;
-            }
-            else
-            {
-                area = Table.DrawCell(interactWith);
-            }
+            RectangleF area = Table.Cells.Contains(interactWith) ? interactWith.Area : Table.DrawCell(interactWith);
 
             bool isOk = true;
-            Bitmap imgNow = (Bitmap)dragBackground.Clone();
+            Bitmap imgNow;
+            lock (dragBackground)
+            {
+                imgNow = (Bitmap)dragBackground.Clone();
+            }
             Graphics g = Graphics.FromImage(imgNow);
             g.SmoothingMode = SmoothingMode.HighSpeed;
             g.CompositingQuality = CompositingQuality.HighSpeed;
@@ -424,8 +423,28 @@ namespace DrawnTableControl
             DrawCell(interactWith.ToString(), interactWith.Font, new SolidBrush(Color.FromArgb(150, interactWith.Brush.Color)), rect, new StringFormat() { Alignment = interactWith.Alignment, LineAlignment = interactWith.LineAlignment }, g);
 
             g.Dispose();
-            Image?.Dispose();
             Image = imgNow;
+        }
+
+        public new Image Image
+        {
+            get => base.Image;
+            set
+            {
+                if (InvokeRequired)
+                {
+                    BeginInvoke((Action) delegate
+                    {
+#pragma warning disable CA2011 // Avoid infinite recursion
+                        Image = value;
+#pragma warning restore CA2011 // Avoid infinite recursion
+                    });
+                    return;
+                }
+
+                base.Image?.Dispose();
+                base.Image = value;
+            }
         }
         #endregion
     }

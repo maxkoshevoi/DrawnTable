@@ -8,10 +8,9 @@ namespace DrawnTableControl.HeaderHelpers
     public class TimeH : IHeaderCreator<TimeSpan, double>
     {
         int tSpan = 1;
-        TimeSpan tStart, tStop, tDelta;
-        readonly List<DrawnTableHeader> lastHeaderResult = new();
+        private TimeSpan tStart, tStop, tDelta;
 
-        public List<DrawnTableHeader> LastGeneratedHeaders => lastHeaderResult;
+        public List<DrawnTableHeader> LastGeneratedHeaders { get; } = new List<DrawnTableHeader>();
 
         public IEnumerable<DrawnTableHeader> GenerateHeaders(TimeSpan start, TimeSpan stop, TimeSpan delta, int span = 1, string format = "hh\\:mm")
         {
@@ -22,23 +21,26 @@ namespace DrawnTableControl.HeaderHelpers
 
             while (start <= stop)
             {
-                DrawnTableHeader header = new(start.ToString(format), span: span, tag: new Tuple<TimeSpan, TimeSpan>(start, start.Add(delta)));
-                lastHeaderResult.Add(header);
+                DrawnTableHeader header = new DrawnTableHeader(start.ToString(format), span: span, tag: new Tuple<TimeSpan, TimeSpan>(start, start.Add(delta)));
+                LastGeneratedHeaders.Add(header);
                 yield return header;
                 start = start.Add(delta);
             }
         }
 
-        public TimeSpan GetValueByIndex(int index)
+        public TimeSpan this[int index]
         {
-            TimeSpan res = tStart;
-            res = res.Add(tDelta.Mult(index / tSpan));
-            index -= (index / tSpan) * tSpan;
-            if (index != 0)
+            get
             {
-                res = res.Add(tDelta.Div(tSpan).Mult(index));
+                TimeSpan res = tStart;
+                res = res.Add(tDelta.Mult(index / tSpan));
+                index -= (index / tSpan) * tSpan;
+                if (index != 0)
+                {
+                    res = res.Add(tDelta.Div(tSpan).Mult(index));
+                }
+                return res;
             }
-            return res;
         }
 
         public double GetIndexByValue(TimeSpan time)

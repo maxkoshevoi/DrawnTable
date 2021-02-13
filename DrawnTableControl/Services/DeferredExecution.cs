@@ -58,16 +58,13 @@ namespace DrawnTableControl.Services
                         Thread.Sleep(1);
                         continue;
                     }
-                    else
-                    {
-                        isDoingWork = true;
-                    }
 
+                    isDoingWork = true;
                     waitToPush = true;
                     Action action = toExecute;
                     toExecute = null;
                     waitToPush = false;
-                    if (InvokeControl != null)
+                    if (InvokeControl?.InvokeRequired == true)
                     {
                         InvokeControl.Invoke(action);
                     }
@@ -87,29 +84,24 @@ namespace DrawnTableControl.Services
 #pragma warning restore CS0168
         }
 
-        public bool IsWorking { get { return worker != null && !worker.IsFaulted && isDoingWork; } }
+        public bool IsWorking => worker != null && !worker.IsFaulted && isDoingWork;
 
         public void Join()
         {
-            if (IsWorking)
+            if (!IsWorking)
             {
-                if (InvokeControl != null && Thread.CurrentThread.ManagedThreadId == GetControlThreadId(InvokeControl))
-                {
-                    throw new InvalidOperationException($"Such action will frozen {nameof(InvokeControl)}'s thread");
-                }
-                while (IsWorking)
-                {
-                    Application.DoEvents();
-                    Thread.Sleep(1);
-                }
+                return;
             }
-        }
 
-        private static int GetControlThreadId(Control control)
-        {
-            int threadId = -1;
-            control.Invoke(new Action(() => threadId = Thread.CurrentThread.ManagedThreadId));
-            return threadId;
+            if (InvokeControl?.InvokeRequired == false)
+            {
+                throw new InvalidOperationException($"Such action will freeze {nameof(InvokeControl)}'s thread");
+            }
+            while (IsWorking)
+            {
+                Application.DoEvents();
+                Thread.Sleep(1);
+            }
         }
     }
 }

@@ -5,17 +5,19 @@ namespace DrawnTableControl.Models
 {
     public class DrawnTableSubheader
     {
-        public string Text { get; private set; }
-        public StringAlignment Alignment { get; private set; }
-        public StringAlignment LineAlignment { get; private set; }
-        public Color ForeColor { get; private set; } = Color.Black;
-        public int Span { get; private set; }
+        public string Text { get; }
+        public Color ForeColor { get; } = Color.Black;
+        public int Span { get; }
         public object Tag { get; set; }
 
-        internal StringFormat format { get; private set; }
+        internal StringFormat format { get; }
 
-        public DrawnTableSubheader(string text = "", Color? foreColor = null,
-            StringAlignment alignment = StringAlignment.Center, StringAlignment lineAlignment = StringAlignment.Center, int span = 1, object tag = null)
+        public DrawnTableSubheader(string text = "", 
+            Color? foreColor = null,
+            StringAlignment alignment = StringAlignment.Center, 
+            StringAlignment lineAlignment = StringAlignment.Center, 
+            int span = 1, 
+            object tag = null)
         {
             Text = text ?? "";
             if (foreColor.HasValue)

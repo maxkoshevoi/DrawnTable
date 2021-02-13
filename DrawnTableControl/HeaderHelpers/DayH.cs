@@ -22,9 +22,8 @@ namespace DrawnTableControl.HeaderHelpers
         }
 
         readonly List<DateTime> lastResult = new();
-        readonly List<DrawnTableHeader> lastHeaderResult = new();
 
-        public List<DrawnTableHeader> LastGeneratedHeaders => lastHeaderResult;
+        public List<DrawnTableHeader> LastGeneratedHeaders { get; } = new();
 
         public DateTime First => lastResult.First();
 
@@ -35,25 +34,20 @@ namespace DrawnTableControl.HeaderHelpers
             return GenerateHeaders(start, start.AddDays(6), null, format, toTitleCase);
         }
 
-        public IEnumerable<DrawnTableHeader> GenerateHeaders(DateTime start, DateTime end, List<DayOfWeek> days = null, string format = "dddd", bool toTitleCase = true)
+        public IEnumerable<DrawnTableHeader> GenerateHeaders(DateTime start, DateTime end, Func<DateTime, bool> condition = null, string format = "dddd", bool toTitleCase = true)
         {
-            if (days != null && days.Count == 0)
-            {
-                days = null;
-            }
-
             start = start.Date;
             end = end.Date;
             if (start > end) throw new ArgumentOutOfRangeException($"\"{nameof(start)}\" can't be bigger then \"{nameof(end)}\"");
-            
+
             lastResult.Clear();
-            lastHeaderResult.Clear();
+            LastGeneratedHeaders.Clear();
 
             DateTime dt = start;
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             while (dt.Date <= end.Date)
             {
-                if (days == null || days.Contains(dt.DayOfWeek))
+                if (condition == null || condition(dt.Date))
                 {
                     lastResult.Add(dt.Date);
 
@@ -62,15 +56,15 @@ namespace DrawnTableControl.HeaderHelpers
                     {
                         text = ti.ToTitleCase(text);
                     }
-                    DrawnTableHeader header = new DrawnTableHeader(text, tag: dt.Date);
-                    lastHeaderResult.Add(header);
+                    DrawnTableHeader header = new(text, tag: dt.Date);
+                    LastGeneratedHeaders.Add(header);
                     yield return header;
                 }
                 dt = dt.AddDays(1);
             }
         }
 
-        public DateTime GetValueByIndex(int index) => lastResult[index];
+        public DateTime this[int index] => lastResult[index];
 
         public int GetIndexByValue(DateTime day) => lastResult.IndexOf(day);
 

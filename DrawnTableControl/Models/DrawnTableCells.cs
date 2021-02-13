@@ -15,20 +15,17 @@ namespace DrawnTableControl.Models
         readonly List<DrawnTableCell> cells;
         readonly Dictionary<int, RectangleF> cellsArea;
 
-        public DrawnTableBackColors BackColors { get; private set; }
+        public DrawnTableBackColors BackColors { get; }
 
-        internal DrawnTableCells(DrawnTable Table)
+        internal DrawnTableCells(DrawnTable table)
         {
-            table = Table;
+            _ = table ?? throw new ArgumentNullException(nameof(table));
+
+            this.table = table;
             lastId = 0;
             cells = new List<DrawnTableCell>();
             cellsArea = new Dictionary<int, RectangleF>();
             BackColors = new DrawnTableBackColors(table);
-
-            if (table == null)
-            {
-                throw new ArgumentNullException(nameof(Table));
-            }
         }
 
         #region Cells
@@ -359,9 +356,9 @@ namespace DrawnTableControl.Models
             readonly DrawnTable table;
             readonly Color[,] backColors;
 
-            public DrawnTableBackColors(DrawnTable Table)
+            public DrawnTableBackColors(DrawnTable table)
             {
-                table = Table;
+                this.table = table;
                 backColors = new Color[table?.RowCount() ?? 0, table?.ColumnCount() ?? 0];
             }
 

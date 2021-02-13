@@ -12,8 +12,8 @@ namespace DrawnTableControl.EventArguments
             ResultCell = resultCell;
         }
 
-        public DrawnTableCell FirstCell { get; private set; }
-        public DrawnTableCell SecondCell { get; private set; }
+        public DrawnTableCell FirstCell { get; }
+        public DrawnTableCell SecondCell { get; }
         public DrawnTableCell ResultCell { get; set; }
     }
 }

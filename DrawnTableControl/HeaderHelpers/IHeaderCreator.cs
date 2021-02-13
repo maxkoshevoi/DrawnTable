@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace DrawnTableControl.HeaderHelpers
 {
-    public interface IHeaderCreator<T, Index>
+    public interface IHeaderCreator<T, out Index>
     {
         List<DrawnTableHeader> LastGeneratedHeaders { get; }
 
-        T GetValueByIndex(int index);
+        T this[int index] { get; }
 
         Index GetIndexByValue(T value);
     }
