@@ -14,14 +14,23 @@ namespace DrawnTableControl.HeaderHelpers
         {
         }
 
-        public void Add(string data) =>
-            Headers.Add(new DrawnTableHeader(data));
+        public void Add(string text) =>
+            Headers.Add(new DrawnTableHeader(text));
 
-        public void Add(string data, object tag) =>
-            Headers.Add(new DrawnTableHeader(data, tag: tag));
+        public void Add(string text, object tag) =>
+            Headers.Add(new DrawnTableHeader(text, tag: tag));
 
         public void Add(DrawnTableHeader header) =>
             Headers.Add(header);
+
+        public void AddRange(IEnumerable<string> dataCollection) =>
+            Headers.AddRange(dataCollection.Select(d => new DrawnTableHeader(d)));
+
+        public void AddRange(IEnumerable<(string text, object tag)> dataTagCollection) =>
+            Headers.AddRange(dataTagCollection.Select(dt => new DrawnTableHeader(dt.text, tag: dt.tag)));
+
+        public void AddRange(IEnumerable<DrawnTableHeader> headerCollection) =>
+            Headers.AddRange(headerCollection);
 
         public void Clear() =>
             Headers.Clear();

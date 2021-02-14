@@ -45,7 +45,7 @@ namespace DrawnTableControl.Demo
             dayStart = headers.Day.GetWeeksMonday(DateTime.Now);
             dayEnd = dayStart.AddDays(6);
 
-            cbLTGroupBy.SelectedIndex = 0;
+            cbLTGroupBy.SelectedIndex = 1;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -101,8 +101,31 @@ namespace DrawnTableControl.Demo
                 case TStyle.LocationTime:
                 {
                     Func<DateTime, bool> colFilter = GetHeaderDayFilter(specificDaysOfWeek, events);
-                    Cols = headers.Day.GenerateHeaders(dayStart, dayEnd, colFilter, "dd, dddd").ToList();
                     Rows = headers.Time.GenerateHeaders(TimeSpan.FromHours(8), TimeSpan.FromHours(18), TimeSpan.FromHours(1), 4).ToList();
+                    if (style == TStyle.DayTime)
+                    {
+                        Cols = headers.Day.GenerateHeaders(dayStart, dayEnd, colFilter, "dd, dddd").ToList();
+                    }
+                    else
+                    {
+                        headers.Custom1.Clear();
+                        headers.Custom1.AddRange(locations.Select(l => (l.Name, (object)l.Id)));
+
+                        if (headers.Custom1.Count > 0)
+                        {
+                            IEnumerable<DrawnTableHeader> dayHeaders = headers.Day.GenerateHeaders(dayStart, dayEnd, colFilter, "dd, dddd");
+                            if (cbLTGroupBy.SelectedIndex == 0)
+                            {
+                                Cols = dayHeaders.ToList();
+                                Cols.ForEach(c => c.Subheaders.AddRange(headers.Custom1.Headers));
+                            }
+                            else
+                            {
+                                Cols = headers.Custom1.Headers;
+                                Cols.ForEach(c => c.Subheaders.AddRange(dayHeaders));
+                            }
+                        }
+                    }
                     break;
                 }
                 case TStyle.DayList:
@@ -179,11 +202,7 @@ namespace DrawnTableControl.Demo
 
         private void Table_CellDragDropFinished(object sender, CellMovedEventArgs e)
         {
-            object cellValue = pbDrawnTable.Table.Cells[e.Location].Value;
-            if (cellValue is Event)
-            {
-                UpdateEventBasedOnTableLocation(pbDrawnTable.Table.Cells[e.Location], e.OldLocation);
-            }
+            UpdateEventBasedOnTableLocation(pbDrawnTable.Table.Cells[e.Location], e.OldLocation);
         }
 
         private void Table_CellWithValueClick(object sender, CellClickEventArgs e)
@@ -283,6 +302,10 @@ namespace DrawnTableControl.Demo
             }
 
             cell.Value = ev;
+            if (ev.Color != null)
+            {
+                cell.Brush = new SolidBrush(ev.Color.Value);
+            }
         }
 
         private DrawnTableCell CreateCell(Event e, HeaderCreator headers, TStyle style)
@@ -387,16 +410,16 @@ namespace DrawnTableControl.Demo
             return ((int)Math.Floor(start), (int)Math.Ceiling(end));
         }
 
-        private int GetLocationTimeColumnIndex(DateTime day, int roomId)
+        private int GetLocationTimeColumnIndex(DateTime day, int locationId)
         {
             int col;
             if (cbLTGroupBy.SelectedIndex == 0)
             {
-                col = headers.GetRealIndex(headers.Day.LastGeneratedHeaders, headers.Day.GetIndexByValue(day), headers.Custom1.GetIndexByHeaderTag(roomId));
+                col = headers.GetRealIndex(headers.Day.LastGeneratedHeaders, headers.Day.GetIndexByValue(day), headers.Custom1.GetIndexByHeaderTag(locationId));
             }
             else
             {
-                col = headers.GetRealIndex(headers.Custom1.Headers, headers.Custom1.GetIndexByHeaderTag(roomId), headers.Day.GetIndexByValue(day));
+                col = headers.GetRealIndex(headers.Custom1.Headers, headers.Custom1.GetIndexByHeaderTag(locationId), headers.Day.GetIndexByValue(day));
             }
 
             return col;
@@ -445,16 +468,16 @@ namespace DrawnTableControl.Demo
                 return;
             }
 
-            int roomCount = 1;
+            int locationCount = 1;
             if (style == TStyle.LocationTime && cbLTGroupBy.SelectedIndex == 0)
             {
-                roomCount = headers.Custom1.Headers.Count;
+                locationCount = headers.Custom1.Headers.Count;
             }
 
             int to = pbDrawnTable.Table.ColumnCount() - 1;
             int timeTo = pbDrawnTable.Table.RowCount() - 1;
 
-            to = Math.Max(0, headers.Day.GetNearestIndexByDay(DateTime.Today, d => DateTime.Today >= d) * roomCount) - 1;
+            to = Math.Max(0, headers.Day.GetNearestIndexByDay(DateTime.Today, d => DateTime.Today >= d) * locationCount) - 1;
             if (style == TStyle.DayTime || style == TStyle.DayList || (style == TStyle.LocationTime && cbLTGroupBy.SelectedIndex == 0))
             {
                 for (int i = 0; i <= to; i++)
@@ -471,7 +494,7 @@ namespace DrawnTableControl.Demo
                         {
                             break;
                         }
-                        for (int i = 1; i <= roomCount; i++)
+                        for (int i = 1; i <= locationCount; i++)
                         {
                             pbDrawnTable.Table.Cells.BackColors[r, to + i] = pastColor;
                         }
@@ -482,11 +505,11 @@ namespace DrawnTableControl.Demo
             {
                 int dayCount = headers.Day.LastGeneratedHeaders.Count;
 
-                for (int roomIndex = 0; roomIndex < headers.Custom1.Count; roomIndex++)
+                for (int locationIndex = 0; locationIndex < headers.Custom1.Count; locationIndex++)
                 {
                     for (int dayIndex = 0; dayIndex <= to; dayIndex++)
                     {
-                        pbDrawnTable.Table.Cells.BackColors.SetColumn(roomIndex * dayCount + dayIndex, pastColor);
+                        pbDrawnTable.Table.Cells.BackColors.SetColumn(locationIndex * dayCount + dayIndex, pastColor);
                     }
 
                     for (int r = 0; r <= timeTo; r++)
@@ -496,7 +519,7 @@ namespace DrawnTableControl.Demo
                         {
                             break;
                         }
-                        pbDrawnTable.Table.Cells.BackColors[r, roomIndex * dayCount + to + 1] = pastColor;
+                        pbDrawnTable.Table.Cells.BackColors[r, locationIndex * dayCount + to + 1] = pastColor;
                     }
                 }
             }
@@ -548,11 +571,11 @@ namespace DrawnTableControl.Demo
                     to = dayCount - 1;
                 }
 
-                for (int roomIndex = 0; roomIndex < headers.Custom1.Count; roomIndex++)
+                for (int locationIndex = 0; locationIndex < headers.Custom1.Count; locationIndex++)
                 {
                     for (int dayIndex = from; dayIndex <= to; dayIndex++)
                     {
-                        pbDrawnTable.Table.Cells.BackColors.SetColumn(roomIndex * dayCount + dayIndex, color);
+                        pbDrawnTable.Table.Cells.BackColors.SetColumn(locationIndex * dayCount + dayIndex, color);
                     }
                 }
             }

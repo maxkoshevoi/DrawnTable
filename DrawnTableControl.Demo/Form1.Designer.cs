@@ -217,7 +217,6 @@ namespace DrawnTableControl.Demo
             "Day",
             "Location"});
             this.cbLTGroupBy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbLTGroupBy.Enabled = false;
             this.cbLTGroupBy.FormattingEnabled = true;
             this.cbLTGroupBy.Items.AddRange(new object[] {
             "Day",
@@ -231,7 +230,6 @@ namespace DrawnTableControl.Demo
             // rbLocationTime
             // 
             this.rbLocationTime.AutoSize = true;
-            this.rbLocationTime.Enabled = false;
             this.rbLocationTime.Location = new System.Drawing.Point(6, 72);
             this.rbLocationTime.Name = "rbLocationTime";
             this.rbLocationTime.Size = new System.Drawing.Size(108, 19);

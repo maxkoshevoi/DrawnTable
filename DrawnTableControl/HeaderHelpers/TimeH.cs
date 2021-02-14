@@ -10,7 +10,7 @@ namespace DrawnTableControl.HeaderHelpers
         private int tSpan = 1;
         private TimeSpan tStart, tStop, tDelta;
 
-        public List<DrawnTableHeader> LastGeneratedHeaders { get; } = new List<DrawnTableHeader>();
+        public List<DrawnTableHeader> LastGeneratedHeaders { get; } = new();
 
         internal TimeH()
         {
@@ -25,7 +25,7 @@ namespace DrawnTableControl.HeaderHelpers
 
             while (start <= stop)
             {
-                DrawnTableHeader header = new DrawnTableHeader(start.ToString(format), span: span, tag: new Tuple<TimeSpan, TimeSpan>(start, start.Add(delta)));
+                DrawnTableHeader header = new(start.ToString(format), span: span, tag: (start, stop: start.Add(delta)));
                 LastGeneratedHeaders.Add(header);
                 yield return header;
                 start = start.Add(delta);
