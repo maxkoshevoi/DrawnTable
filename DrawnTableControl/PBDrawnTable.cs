@@ -46,21 +46,27 @@ namespace DrawnTableControl
         }
 
         #region Mouse
-        // Всплывающая подсказка
-        readonly ToolTip toolTip;
-        // Необходимо для реализации DradAndDrop
+        private readonly ToolTip toolTip;
+        // Needed for Drad&Drop
         internal bool? mouseDown = false;
-        Point startDrag;
-        DrawnTableCell interactWith;
-        Bitmap dragBackground;
-        CellLocation? dragCoord;
-        bool allowDrop;
-        InteractAction action;
-        // Копирование ячейки перетаскиванием
-        bool copyMode_DrugDrop;
-        DrawnTableCell copySource;
+        private Point startDrag;
+        private DrawnTableCell interactWith;
+        private Bitmap dragBackground;
+        private CellLocation? dragCoord;
+        private bool allowDrop;
+        private InteractAction action;
+        // Cell is being copied user Drag&Drop
+        private bool copyMode_DrugDrop;
+        private DrawnTableCell copySource;
 
-        enum InteractAction { None, Hover, Click, Drag, CellCreating }
+        private enum InteractAction 
+        { 
+            None, 
+            Hover, 
+            Click, 
+            Drag, 
+            CellCreating 
+        }
 
         private Point CursorPosition() => PointToClient(Cursor.Position);
 
@@ -422,7 +428,11 @@ namespace DrawnTableControl
                 interactWith.Font,
                 new SolidBrush(Color.FromArgb(150, interactWith.Brush.Color)),
                 rect,
-                new StringFormat() { Alignment = interactWith.Alignment, LineAlignment = interactWith.LineAlignment },
+                new StringFormat() 
+                { 
+                    Alignment = interactWith.Alignment, 
+                    LineAlignment = interactWith.LineAlignment 
+                },
                 g);
 
             Image = imgNow;

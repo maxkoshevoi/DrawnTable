@@ -30,7 +30,7 @@ namespace DrawnTableControl.Demo
         private readonly Color weekendColor = Color.FromArgb(75, Color.LightSeaGreen);
         private readonly Color pastColor = Color.FromArgb(25, Color.Gray);
 
-        enum TStyle 
+        private enum TStyle 
         { 
             None, 
             DayTime, 
@@ -62,7 +62,7 @@ namespace DrawnTableControl.Demo
             UpdateTable();
         }
 
-        void InitTable(List<DrawnTableHeader> Rows, List<DrawnTableHeader> Cols)
+        private void InitTable(List<DrawnTableHeader> Rows, List<DrawnTableHeader> Cols)
         {
             pbDrawnTable.Table.Create(Rows, Cols);
             pbDrawnTable.Table.CellCreating += Table_CellCreating;
@@ -614,7 +614,7 @@ namespace DrawnTableControl.Demo
         }
         #endregion
 
-        TStyle GetStyle()
+        private TStyle GetStyle()
         {
             if (rbDayTime.Checked)
             {

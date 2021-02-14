@@ -56,7 +56,7 @@ namespace DrawnTableControl
                     return;
                 }
 
-                foreach (var cell in Cells)
+                foreach (DrawnTableCell cell in Cells)
                 {
                     if (cell is not DrawnTableCellsOverlap)
                     {
@@ -115,7 +115,7 @@ namespace DrawnTableControl
 
         internal Bitmap table { get; private set; }
 
-        readonly PBDrawnTable Owner;
+        private readonly PBDrawnTable Owner;
         internal DeferredExecution dRedrawEx;
         internal bool isRedrawingSuspended = false;
 

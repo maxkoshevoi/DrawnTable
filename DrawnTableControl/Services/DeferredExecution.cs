@@ -7,14 +7,14 @@ namespace DrawnTableControl.Services
 {
     public class DeferredExecution
     {
-        Task worker;
-        Action toExecute;
+        private Task worker;
+        private Action toExecute;
 
         public Control InvokeControl;
         public volatile int MinDelay;
-        volatile bool isDoingWork;
-        bool waitToPush;
-        bool isPaused;
+        private volatile bool isDoingWork;
+        private bool waitToPush;
+        private bool isPaused;
 
         public DeferredExecution(int minDelay, Control invokeControl = null)
         {
@@ -46,7 +46,7 @@ namespace DrawnTableControl.Services
             }
         }
 
-        void DoWork()
+        private void DoWork()
         {
             try
             {

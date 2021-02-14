@@ -10,10 +10,10 @@ namespace DrawnTableControl.Models
 {
     public class DrawnTableCells : IEnumerable<DrawnTableCell>
     {
-        int lastId;
-        readonly DrawnTable table;
-        readonly List<DrawnTableCell> cells;
-        readonly Dictionary<int, RectangleF> cellsArea;
+        private int lastId;
+        private readonly DrawnTable table;
+        private readonly List<DrawnTableCell> cells;
+        private readonly Dictionary<int, RectangleF> cellsArea;
 
         public DrawnTableBackColors BackColors { get; }
 
@@ -358,8 +358,8 @@ namespace DrawnTableControl.Models
         #region BackColors
         public class DrawnTableBackColors
         {
-            readonly DrawnTable table;
-            readonly Color[,] backColors;
+            private readonly DrawnTable table;
+            private readonly Color[,] backColors;
 
             public DrawnTableBackColors(DrawnTable table)
             {

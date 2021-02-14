@@ -159,7 +159,7 @@ namespace DrawnTableControl.Models
             return base.GetHashCode();
         }
 
-        bool isCloning = false;
+        private bool isCloning = false;
         public object Clone(bool isCopyTable = false)
         {
             isCloning = true;

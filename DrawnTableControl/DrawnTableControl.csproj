@@ -12,4 +12,8 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+  
 </Project>

@@ -1,0 +1,27 @@
+﻿# Full rule list: https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/code-style-rule-options
+[*.cs]
+
+# Indentation preferences
+csharp_indent_case_contents_when_block = false
+
+# var preferences
+csharp_style_var_for_built_in_types = false:warning
+
+# Modifier preferences
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+
+# Expression-level preferences
+csharp_prefer_simple_default_expression = true:warning
+dotnet_style_prefer_auto_properties = true:warning
+dotnet_style_prefer_compound_assignment = true:warning
+dotnet_style_prefer_simplified_interpolation = true:warning
+csharp_style_prefer_index_operator = true:warning
+csharp_style_prefer_range_operator = true:warning
+
+# Pattern matching preferences
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+csharp_style_prefer_switch_expression = true:warning
+
+# Suppression preferences
+dotnet_remove_unnecessary_suppression_exclusions = suggestion

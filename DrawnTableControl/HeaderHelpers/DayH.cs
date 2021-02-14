@@ -25,7 +25,7 @@ namespace DrawnTableControl.HeaderHelpers
             return dt.Value.Date;
         }
 
-        readonly List<DateTime> lastResult = new();
+        private readonly List<DateTime> lastResult = new();
 
         public List<DrawnTableHeader> LastGeneratedHeaders { get; } = new();
 
@@ -84,7 +84,7 @@ namespace DrawnTableControl.HeaderHelpers
                 return -1;
             }
 
-            var minDif = diffs.Min(d => d.diff);
+            double minDif = diffs.Min(d => d.diff);
             int nearestIndex = diffs.First(d => d.diff == minDif).index;
             return nearestIndex;
         }

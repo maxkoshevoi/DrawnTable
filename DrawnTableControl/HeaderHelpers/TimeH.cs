@@ -7,7 +7,7 @@ namespace DrawnTableControl.HeaderHelpers
 {
     public class TimeH : IHeaderCreator<TimeSpan, double>
     {
-        int tSpan = 1;
+        private int tSpan = 1;
         private TimeSpan tStart, tStop, tDelta;
 
         public List<DrawnTableHeader> LastGeneratedHeaders { get; } = new List<DrawnTableHeader>();
