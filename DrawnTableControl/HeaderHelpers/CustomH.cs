@@ -27,7 +27,7 @@ namespace DrawnTableControl.HeaderHelpers
             Headers.Clear();
 
         public void SetHeaders(IEnumerable<string> h) =>
-            Headers = HeaderCreator.ParseList(h.ToList());
+            Headers = HeaderCreator.ParseList(h);
 
         public int GetIndexByHeader(DrawnTableHeader header) =>
             Headers.IndexOf(header);
@@ -42,7 +42,7 @@ namespace DrawnTableControl.HeaderHelpers
 
         public int GetIndexByHeaderTag(object tag)
         {
-            var match = Headers.Where(x => x.Tag.Equals(tag)).ToList();
+            var match = Headers.Where(x => x.Tag?.Equals(tag) == true).ToList();
             if (match.Count == 0) return -1;
 
             return GetIndexByHeader(match[0]);

@@ -105,16 +105,8 @@ namespace DrawnTableControl.Services
         {
             if (table.IsEnabled)
             {
-                try
-                {
-                    Rectangle position = ev.MarginBounds;
-
-                    // Draw chart on the printer graphics
-                    PrintPaint(ev.Graphics, position);
-                }
-                finally
-                {
-                }
+                Rectangle position = ev.MarginBounds;
+                PrintPaint(ev.Graphics, position);
             }
         }
 

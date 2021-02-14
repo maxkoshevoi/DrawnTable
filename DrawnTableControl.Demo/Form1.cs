@@ -66,6 +66,7 @@ namespace DrawnTableControl.Demo
         {
             pbDrawnTable.Table.Create(Rows, Cols);
             pbDrawnTable.Table.CellCreating += Table_CellCreating;
+            pbDrawnTable.Table.CellCreated += Table_CellCreated;
             pbDrawnTable.Table.CellWithValueClick += Table_CellWithValueClick;
             pbDrawnTable.Table.CellOverlapPlaceholderClick += Table_CellOverlapPlaceholderClick;
             pbDrawnTable.Table.CellDragDropFinished += Table_CellDragDropFinished;
@@ -190,21 +191,7 @@ namespace DrawnTableControl.Demo
             DrawnTableCell cell = pbDrawnTable.Table.Cells[e.CellLocation];
             if (e.Button == MouseButtons.Left)
             {
-                if (cell.Value is not Event)
-                {
-                    // User clicked on "+" cell. Creating new event on its place
-
-                    Event ev = new();
-                    events.Add(ev);
-
-                    cell.Value = ev;
-                    cell.ResetStyle();
-                    UpdateEventBasedOnTableLocation(cell);
-                }
-                else
-                {
-                    MessageBox.Show("Event clicked");
-                }
+                MessageBox.Show(cell.Value.ToString(), "Event clicked");
             }
             else
             {
@@ -214,7 +201,7 @@ namespace DrawnTableControl.Demo
 
         private void Table_CellOverlapPlaceholderClick(object sender, CellOverlapEventArgs e)
         {
-            List<Event> events = e.OverlappingCells.Select(oc => oc.Value as Event).ToList();
+            List<Event> events = e.OverlappingCells.Select(oc => (Event)oc.Value).ToList();
             MessageBox.Show($"{events.Count} events are overlaping", "Overlapped cell clicked");
         }
 
@@ -228,6 +215,17 @@ namespace DrawnTableControl.Demo
             cell.Alignment = StringAlignment.Center;
             cell.LineAlignment = StringAlignment.Center;
             cell.Value = value;
+        }
+
+        private void Table_CellCreated(object sender, CellChangedEventArgs e)
+        {
+            Event ev = new();
+            events.Add(ev);
+
+            DrawnTableCell cell = pbDrawnTable.Table.Cells[e.Location];
+            cell.Value = ev;
+            cell.ResetStyle();
+            UpdateEventBasedOnTableLocation(cell);
         }
 
         private void UpdateEventBasedOnTableLocation(DrawnTableCell cell, CellLocation? movedFrom = null)
@@ -356,7 +354,7 @@ namespace DrawnTableControl.Demo
 
             if (e.Color != null)
             {
-                cell.Brush = new SolidBrush(e.Color.Value);
+                cell.Brush = e.Enabled ? new SolidBrush(e.Color.Value) : new SolidBrush(Color.FromArgb(100, e.Color.Value));
             }
             cell.Enabled = e.Enabled;
             return cell;

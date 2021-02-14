@@ -96,9 +96,8 @@ namespace DrawnTableControl
                         {
                             dragBackground = (Bitmap)Table.table.Clone();
                         }
-                        Graphics g = GetGraphics(dragBackground);
+                        using Graphics g = GetGraphics(dragBackground);
 
-                        // Drawing back colors
                         Table.DrawBackColors(g);
 
                         // Drawing cells
@@ -107,32 +106,28 @@ namespace DrawnTableControl
                             if (item == interactWith && !copyMode_DrugDrop) continue;
                             Table.DrawCell(item, g);
                         }
-                        g.Dispose();
 
                         Table.dRedrawEx.Resume();
                     }
                 }
-                else
+                else if (Table.AllowCreateNewCells)
                 {
-                    if (Table.AllowCreateNewCells)
+                    CellLocation? cLoc = Table.GetCellLocation(e.Location);
+                    if (cLoc != null && Table.Cells[(CellLocation)cLoc] == null)
                     {
-                        CellLocation? cLoc = Table.GetCellLocation(e.Location);
-                        if (cLoc != null && Table.Cells[(CellLocation)cLoc] == null)
+                        DrawnTableCell cell = new(cLoc.Value);
+                        Table.Cells.Add(cell, false);
+                        CellChangedEventArgs args = new(cLoc.Value);
+                        Table.OnCellCreating(args);
+                        if (!args.Handled)
                         {
-                            DrawnTableCell cell = new(cLoc.Value);
-                            Table.Cells.Add(cell, false);
-                            CellChangedEventArgs args = new(cLoc.Value);
-                            Table.OnCellCreating(args);
-                            if (!args.Handled)
-                            {
-                                action = InteractAction.CellCreating;
-                                interactWith = Table.Cells[cLoc.Value];
-                                Table.Redraw();
-                            }
-                            else
-                            {
-                                Table.Cells.Remove(cLoc.Value);
-                            }
+                            action = InteractAction.CellCreating;
+                            interactWith = Table.Cells[cLoc.Value];
+                            Table.Redraw();
+                        }
+                        else
+                        {
+                            Table.Cells.Remove(cLoc.Value);
                         }
                     }
                 }
@@ -162,12 +157,13 @@ namespace DrawnTableControl
                 {
                     bool sameTable = interactWith.Table == Table;
                     // Whether the MouseDown cell matches the MouseUp one
-                    bool sameCell = dragCoord != null && sameTable && interactWith.Location == dragCoord.Value;
+                    bool sameLocation = dragCoord != null && sameTable && interactWith.Location == dragCoord.Value;
+                    bool sameCell = interactWith == Table.Cells[e.Location];
 
                     // DragDrop
                     if (action == InteractAction.Drag && allowDrop)
                     {
-                        if (dragCoord != null && !sameCell)
+                        if (dragCoord != null && !sameLocation)
                         {
                             CellLocation? oldLocation = null;
                             if (sameTable)
@@ -208,7 +204,7 @@ namespace DrawnTableControl
                     }
 
                     // Click
-                    if (sameCell && action == InteractAction.Click)
+                    if (action == InteractAction.Click && sameCell)
                     {
                         if (interactWith is DrawnTableCellsOverlap)
                         {
@@ -318,16 +314,18 @@ namespace DrawnTableControl
                     else if (interactWith != null && interactWith.Enabled)
                     {
                         Cursor = Cursors.Hand;
+
                         if (interactWith is DrawnTableCellsOverlap)
                         {
                             allowDrop = false;
                         }
                         else if (Table.AllowDragDrop)
                         {
-                            if (action == InteractAction.Drag || Math.Pow(startDrag.X - e.X, 2) + Math.Pow(startDrag.Y - e.Y, 2) > 3)
+                            bool isMovedFarEnoughToStartDragDrop = Math.Pow(startDrag.X - e.X, 2) + Math.Pow(startDrag.Y - e.Y, 2) > 3;
+                            if (action == InteractAction.Drag || isMovedFarEnoughToStartDragDrop)
                             {
                                 action = InteractAction.Drag;
-                                Table.dRedrawEx.Execute(() => { RedrawCellDrag(e); });
+                                Table.dRedrawEx.Execute(() => RedrawCellDrag(e));
                             }
                         }
                     }
@@ -343,21 +341,24 @@ namespace DrawnTableControl
 
         private void RedrawCellDrag(MouseEventArgs e)
         {
-            RectangleF area = Table.Cells.Contains(interactWith) ? interactWith.Area : Table.DrawCell(interactWith);
-
             bool isOk = true;
             Bitmap imgNow;
             lock (dragBackground)
             {
                 imgNow = (Bitmap)dragBackground.Clone();
             }
-            Graphics g = Graphics.FromImage(imgNow);
+            using Graphics g = Graphics.FromImage(imgNow);
             g.SmoothingMode = SmoothingMode.HighSpeed;
             g.CompositingQuality = CompositingQuality.HighSpeed;
 
+            RectangleF area = Table.Cells.Contains(interactWith) ? interactWith.Area : Table.DrawCell(interactWith);
             RectangleF rect = new(e.X - (startDrag.X - area.X), e.Y - (startDrag.Y - area.Y), area.Width, area.Height);
             CellLocation? cLoc = Table.GetCellLocation(new PointF(rect.X + rect.Width / 2, (int)(rect.Y + Table.RowHeight / 2)));
-            if (cLoc != null)
+            if (cLoc == null)
+            {
+                isOk = false;
+            }
+            else
             {
                 RectangleF cellA = Table.GetCellArea(cLoc.Value);
                 if (interactWith.Rowspan != 1)
@@ -408,10 +409,6 @@ namespace DrawnTableControl
                 }
                 g.FillRectangle(new SolidBrush(Color.FromArgb(75, color)), cellA);
             }
-            else
-            {
-                isOk = false;
-            }
             dragCoord = cLoc;
             allowDrop = isOk;
 
@@ -420,9 +417,14 @@ namespace DrawnTableControl
                 return;
             }
 
-            DrawCell(interactWith.ToString(), interactWith.Font, new SolidBrush(Color.FromArgb(150, interactWith.Brush.Color)), rect, new StringFormat() { Alignment = interactWith.Alignment, LineAlignment = interactWith.LineAlignment }, g);
+            DrawCell(
+                interactWith.ToString(),
+                interactWith.Font,
+                new SolidBrush(Color.FromArgb(150, interactWith.Brush.Color)),
+                rect,
+                new StringFormat() { Alignment = interactWith.Alignment, LineAlignment = interactWith.LineAlignment },
+                g);
 
-            g.Dispose();
             Image = imgNow;
         }
 

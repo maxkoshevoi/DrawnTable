@@ -272,11 +272,10 @@ namespace DrawnTableControl
             }
 
             Bitmap img = new(Math.Max(5, Owner.Width), Math.Max(5, Owner.Height));
-            Graphics g = GetGraphics(img);
+            using Graphics g = GetGraphics(img);
 
             ActualRedraw(g, area);
 
-            g.Dispose();
             Owner.Image = img;
         }
 
@@ -362,11 +361,10 @@ namespace DrawnTableControl
         private Bitmap RedrawBackground()
         {
             Bitmap img = new((int)TableArea.Width, (int)TableArea.Height);
-            Graphics g = Graphics.FromImage(img);
+            using Graphics g = Graphics.FromImage(img);
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             DrawTable(g, TableArea.Size, ColumnHeaders, RowHeaders, GetDefaultFont());
-            g.Dispose();
             UpdateCellArea();
             return img;
         }
@@ -414,7 +412,7 @@ namespace DrawnTableControl
                 float W = (colW + 1) * (hasSubheaders ? col.Subheaders.Sum(sh => sh.Span) : col.Span) - 1;
                 if (!string.IsNullOrEmpty(col.Text))
                 {
-                    g.DrawString(col.Text, font, new SolidBrush(col.ForeColor), new RectangleF(x, 0, W, colHeaderH + (hasSubheaders ? 0 : colSubheaderH)), col.format);
+                    g.DrawString(col.Text, font, new SolidBrush(col.ForeColor), new RectangleF(x, 0, W, colHeaderH + (hasSubheaders ? 0 : colSubheaderH)), col.Format);
                 }
                 x += W;
 
@@ -431,7 +429,7 @@ namespace DrawnTableControl
                     W = (colW + 1) * subcol.Span - 1;
                     if (!string.IsNullOrEmpty(subcol.Text))
                     {
-                        g.DrawString(subcol.Text, font, new SolidBrush(subcol.ForeColor), new RectangleF(subheaderX, colHeaderH, W, colSubheaderH), subcol.format);
+                        g.DrawString(subcol.Text, font, new SolidBrush(subcol.ForeColor), new RectangleF(subheaderX, colHeaderH, W, colSubheaderH), subcol.Format);
                     }
                     subheaderX += W;
                 }
@@ -446,7 +444,7 @@ namespace DrawnTableControl
                 float H = (rowH + 1) * (hasSubheaders ? row.Subheaders.Sum(sh => sh.Span) : row.Span) - 1;
                 if (!string.IsNullOrEmpty(row.Text))
                 {
-                    g.DrawString(row.Text, font, new SolidBrush(row.ForeColor), new RectangleF(0, y, rowHeaderW + (hasSubheaders ? 0 : rowSubheaderW), H), row.format);
+                    g.DrawString(row.Text, font, new SolidBrush(row.ForeColor), new RectangleF(0, y, rowHeaderW + (hasSubheaders ? 0 : rowSubheaderW), H), row.Format);
                 }
                 y += H;
 
@@ -460,7 +458,7 @@ namespace DrawnTableControl
                         H = (rowH + 1) * subrow.Span - 1;
                         if (!string.IsNullOrEmpty(subrow.Text))
                         {
-                            g.DrawString(subrow.Text, font, new SolidBrush(subrow.ForeColor), new RectangleF(rowHeaderW, subheaderY, rowSubheaderW, H), subrow.format);
+                            g.DrawString(subrow.Text, font, new SolidBrush(subrow.ForeColor), new RectangleF(rowHeaderW, subheaderY, rowSubheaderW, H), subrow.Format);
                         }
                         subheaderY += H;
                     }

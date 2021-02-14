@@ -49,7 +49,7 @@ namespace DrawnTableControl.Models
             {
                 throw new ArgumentException("Tables must be the same");
             }
-            return cellsArea[cell.innerId];
+            return cellsArea[cell.InnerId];
         }
 
         internal void UpdateArea(DrawnTableCell cell)
@@ -59,9 +59,9 @@ namespace DrawnTableControl.Models
                 throw new ArgumentException("This cell doesn't exists in this table");
             }
 
-            RectangleF oldArea = cellsArea[cell.innerId];
-            cellsArea[cell.innerId] = table.DrawCell(cell);
-            if (cellsArea[cell.innerId] != oldArea)
+            RectangleF oldArea = cellsArea[cell.InnerId];
+            cellsArea[cell.InnerId] = table.DrawCell(cell);
+            if (cellsArea[cell.InnerId] != oldArea)
             {
                 table.Redraw();
             }
@@ -74,7 +74,7 @@ namespace DrawnTableControl.Models
                 throw new ArgumentException("This cell doesn't exists in this table");
             }
 
-            cellsArea[cell.innerId] = newArea;
+            cellsArea[cell.InnerId] = newArea;
         }
         #endregion
 
@@ -124,13 +124,13 @@ namespace DrawnTableControl.Models
                 }
                 cell.Table = table;
                 cells.Add(cell);
-                cellsArea.Add(cell.innerId, area);
+                cellsArea.Add(cell.InnerId, area);
             }
             else
             {
                 RectangleF area = table.DrawCell(cell);
                 cells.Add(cell);
-                cellsArea.Add(cell.innerId, area);
+                cellsArea.Add(cell.InnerId, area);
             }
             if (draw)
             {
@@ -140,7 +140,7 @@ namespace DrawnTableControl.Models
 
         private void HandleCellOverlap(ref DrawnTableCell newCell, ref RectangleF totalArea, DrawnTableCell existingCell)
         {
-            Remove(existingCell.innerId);
+            Remove(existingCell.InnerId);
             if (table.IfCellsOverlap == DrawnTableOverlapOptions.ReplaceWithCounter)
             {
                 newCell.Table = null;
@@ -253,7 +253,7 @@ namespace DrawnTableControl.Models
             bool res = cells.Remove(cell);
             if (res)
             {
-                cellsArea.Remove(cell.innerId);
+                cellsArea.Remove(cell.InnerId);
                 cell.Table = null;
                 table.Redraw();
             }
@@ -264,14 +264,14 @@ namespace DrawnTableControl.Models
         {
             if (cell.Table != table) return false;
 
-            return Remove(cell.innerId);
+            return Remove(cell.InnerId);
         }
 
         internal bool Remove(int InnerId)
         {
             foreach (DrawnTableCell cell in cells)
             {
-                if (cell.innerId == InnerId)
+                if (cell.InnerId == InnerId)
                 {
                     Remove(cell.Location);
                     return true;
@@ -292,7 +292,7 @@ namespace DrawnTableControl.Models
             {
                 if (cell.Value != null && cell.Value.Equals(Value))
                 {
-                    toRemove.Add(cell.innerId);
+                    toRemove.Add(cell.InnerId);
                 }
             }
 

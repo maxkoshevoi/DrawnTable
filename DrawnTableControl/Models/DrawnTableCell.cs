@@ -6,7 +6,8 @@ namespace DrawnTableControl.Models
     public class DrawnTableCell : ICloneable
     {
         #region Variables
-        internal int innerId { get; private set; } = 0;
+        internal int InnerId { get; private set; } = 0;
+
         private DrawnTable table;
         public DrawnTable Table
         {
@@ -14,7 +15,7 @@ namespace DrawnTableControl.Models
             internal set
             {
                 if (value == table) return;
-                table?.Cells.Remove(innerId);
+                table?.Cells.Remove(InnerId);
                 table = value;
                 ResetInnerId(table);
 
@@ -115,7 +116,7 @@ namespace DrawnTableControl.Models
 
         private void ResetInnerId(DrawnTable table)
         {
-            innerId = table?.Cells.GetNextId() ?? 0;
+            InnerId = table?.Cells.GetNextId() ?? 0;
         }
 
         private void UpdateArea()
@@ -140,7 +141,7 @@ namespace DrawnTableControl.Models
 
         public static bool operator ==(DrawnTableCell one, DrawnTableCell other)
         {
-            return one?.Table == other?.Table && one?.innerId == other?.innerId;
+            return one?.Table == other?.Table && one?.InnerId == other?.InnerId;
         }
         public static bool operator !=(DrawnTableCell one, DrawnTableCell other) => !(one == other);
 

@@ -10,7 +10,7 @@ namespace DrawnTableControl.Models
         public int Span { get; }
         public object Tag { get; set; }
 
-        internal StringFormat format { get; }
+        internal StringFormat Format { get; }
 
         public DrawnTableSubheader(string text = "", 
             Color? foreColor = null,
@@ -24,7 +24,7 @@ namespace DrawnTableControl.Models
             {
                 ForeColor = foreColor.Value;
             }
-            format = new StringFormat()
+            Format = new StringFormat()
             {
                 Alignment = alignment,
                 LineAlignment = lineAlignment,
@@ -32,7 +32,7 @@ namespace DrawnTableControl.Models
             };
             if (span < 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(span), $"{nameof(span)} can't be less then 1.");
+                throw new ArgumentOutOfRangeException(nameof(span), $"{nameof(span)} can't be less than 1.");
             }
             Span = span;
             Tag = tag;
