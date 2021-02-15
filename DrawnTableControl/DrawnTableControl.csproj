@@ -12,6 +12,7 @@
     <RepositoryUrl>https://github.com/maxkoshevoi/DrawnTable</RepositoryUrl>
     <PackageTags>WinForms, table, datagrid, custom-control</PackageTags>
     <RepositoryType>git</RepositoryType>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
