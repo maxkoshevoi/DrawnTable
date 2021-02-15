@@ -13,6 +13,7 @@
     <PackageTags>WinForms, table, datagrid, custom-control</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Version>1.0.1</Version>
+    <Description>Custom WinForms control based on PictureBox for creating versatile tables</Description>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
