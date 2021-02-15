@@ -6,15 +6,16 @@
     <OutputType>Library</OutputType>
     <UseWindowsForms>true</UseWindowsForms>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <Copyright>Maksym Koshovyi © 2018</Copyright>
+    <Authors>Maksym Koshovyi</Authors>
+    <PackageId>DrawnTableControl_Maksym_Koshovyi</PackageId>
+    <RepositoryUrl>https://github.com/maxkoshevoi/DrawnTable</RepositoryUrl>
+    <PackageTags>WinForms, table, datagrid, custom-control</PackageTags>
   </PropertyGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
     <Reference Include="System.Windows.Forms" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
   
 </Project>
