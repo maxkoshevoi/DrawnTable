@@ -53,8 +53,12 @@ namespace DrawnTableControl.Demo
             Font defaultFont = pbDrawnTable.Table.GetDefaultFont();
             pbDrawnTable.Font = new Font(defaultFont.FontFamily, 10);
 
-            events.AddRange(GenerateEvents(TimeSpan.FromHours(8), TimeSpan.FromHours(18)).Take(6));
-            UpdateTable();
+            GenerateEvents();
+        }
+
+        private void bGenerateEvents_Click(object sender, EventArgs e)
+        {
+            GenerateEvents();
         }
 
         private void Setting_Changed(object sender, EventArgs e)
@@ -215,6 +219,7 @@ namespace DrawnTableControl.Demo
             else
             {
                 pbDrawnTable.Table.Cells.Remove(cell);
+                events.Remove((Event)cell.Value);
             }
         }
 
@@ -654,9 +659,16 @@ namespace DrawnTableControl.Demo
             return TStyle.None;
         }
 
+        private void GenerateEvents()
+        {
+            events.Clear();
+            events.AddRange(GenerateEvents(TimeSpan.FromHours(8), TimeSpan.FromHours(18)).Take((int)numEventsCount.Value));
+            UpdateTable();
+        }
+
         private IEnumerable<Event> GenerateEvents(TimeSpan timeFrom, TimeSpan timeTo)
         {
-            TimeSpan durationFrom = TimeSpan.FromHours(1), durationTo = TimeSpan.FromHours(3);
+            TimeSpan durationFrom = TimeSpan.FromMinutes(30), durationTo = TimeSpan.FromHours(2);
 
             Random r = new();
             int dayRange = (dayEnd - dayStart).Days;
