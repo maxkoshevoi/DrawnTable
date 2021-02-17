@@ -5,7 +5,7 @@ namespace DrawnTableControl.Models
 {
     public class DrawnTableHeader : DrawnTableSubheader
     {
-        public List<DrawnTableSubheader> Subheaders { get; } = new List<DrawnTableSubheader>();
+        public List<DrawnTableSubheader> Subheaders { get; } = new();
 
         public DrawnTableHeader(string text = "", 
             Color? foreColor = null,

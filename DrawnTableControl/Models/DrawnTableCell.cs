@@ -61,6 +61,7 @@ namespace DrawnTableControl.Models
         }
         private SolidBrush brush;
         public SolidBrush Brush { get => brush; set { brush = value; RedrawTable(); } }
+
         private Font font;
         public Font Font
         {

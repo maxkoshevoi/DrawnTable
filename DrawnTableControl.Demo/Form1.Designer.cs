@@ -53,12 +53,17 @@ namespace DrawnTableControl.Demo
             this.chColorWeekends = new System.Windows.Forms.CheckBox();
             this.chDragDrop = new System.Windows.Forms.CheckBox();
             this.chAllowCreateNewCell = new System.Windows.Forms.CheckBox();
+            this.numEventsCount = new System.Windows.Forms.NumericUpDown();
+            this.bGenerateEvents = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.pbDrawnTable)).BeginInit();
             this.pViewDays.SuspendLayout();
             this.gLayout.SuspendLayout();
             this.gWeekDays.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numEventsCount)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // pbDrawnTable
@@ -69,14 +74,14 @@ namespace DrawnTableControl.Demo
             this.pbDrawnTable.Image = null;
             this.pbDrawnTable.Location = new System.Drawing.Point(220, 12);
             this.pbDrawnTable.Name = "pbDrawnTable";
-            this.pbDrawnTable.Size = new System.Drawing.Size(891, 534);
+            this.pbDrawnTable.Size = new System.Drawing.Size(891, 585);
             this.pbDrawnTable.TabIndex = 0;
             this.pbDrawnTable.TabStop = false;
             // 
             // chHideEmptyColumns
             // 
             this.chHideEmptyColumns.AutoSize = true;
-            this.chHideEmptyColumns.Location = new System.Drawing.Point(13, 372);
+            this.chHideEmptyColumns.Location = new System.Drawing.Point(10, 431);
             this.chHideEmptyColumns.Name = "chHideEmptyColumns";
             this.chHideEmptyColumns.Size = new System.Drawing.Size(137, 19);
             this.chHideEmptyColumns.TabIndex = 3;
@@ -204,7 +209,7 @@ namespace DrawnTableControl.Demo
             this.gLayout.Controls.Add(this.rbLocationTime);
             this.gLayout.Controls.Add(this.rbDayList);
             this.gLayout.Controls.Add(this.rbDayTime);
-            this.gLayout.Location = new System.Drawing.Point(13, 12);
+            this.gLayout.Location = new System.Drawing.Point(10, 71);
             this.gLayout.Name = "gLayout";
             this.gLayout.Size = new System.Drawing.Size(201, 99);
             this.gLayout.TabIndex = 5;
@@ -265,7 +270,7 @@ namespace DrawnTableControl.Demo
             // gWeekDays
             // 
             this.gWeekDays.Controls.Add(this.pViewDays);
-            this.gWeekDays.Location = new System.Drawing.Point(13, 117);
+            this.gWeekDays.Location = new System.Drawing.Point(10, 176);
             this.gWeekDays.Name = "gWeekDays";
             this.gWeekDays.Size = new System.Drawing.Size(201, 199);
             this.gWeekDays.TabIndex = 6;
@@ -275,7 +280,7 @@ namespace DrawnTableControl.Demo
             // bPrint
             // 
             this.bPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.bPrint.Location = new System.Drawing.Point(12, 523);
+            this.bPrint.Location = new System.Drawing.Point(12, 574);
             this.bPrint.Name = "bPrint";
             this.bPrint.Size = new System.Drawing.Size(196, 23);
             this.bPrint.TabIndex = 7;
@@ -290,7 +295,7 @@ namespace DrawnTableControl.Demo
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.flowLayoutPanel1);
-            this.groupBox1.Location = new System.Drawing.Point(10, 404);
+            this.groupBox1.Location = new System.Drawing.Point(7, 463);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(195, 74);
             this.groupBox1.TabIndex = 8;
@@ -337,7 +342,7 @@ namespace DrawnTableControl.Demo
             this.chDragDrop.AutoSize = true;
             this.chDragDrop.Checked = true;
             this.chDragDrop.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chDragDrop.Location = new System.Drawing.Point(13, 322);
+            this.chDragDrop.Location = new System.Drawing.Point(10, 381);
             this.chDragDrop.Name = "chDragDrop";
             this.chDragDrop.Size = new System.Drawing.Size(141, 19);
             this.chDragDrop.TabIndex = 9;
@@ -350,7 +355,7 @@ namespace DrawnTableControl.Demo
             this.chAllowCreateNewCell.AutoSize = true;
             this.chAllowCreateNewCell.Checked = true;
             this.chAllowCreateNewCell.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chAllowCreateNewCell.Location = new System.Drawing.Point(13, 347);
+            this.chAllowCreateNewCell.Location = new System.Drawing.Point(10, 406);
             this.chAllowCreateNewCell.Name = "chAllowCreateNewCell";
             this.chAllowCreateNewCell.Size = new System.Drawing.Size(142, 19);
             this.chAllowCreateNewCell.TabIndex = 10;
@@ -358,11 +363,50 @@ namespace DrawnTableControl.Demo
             this.chAllowCreateNewCell.UseVisualStyleBackColor = true;
             this.chAllowCreateNewCell.CheckedChanged += new System.EventHandler(this.Setting_Changed);
             // 
+            // numEventsCount
+            // 
+            this.numEventsCount.Location = new System.Drawing.Point(6, 22);
+            this.numEventsCount.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.numEventsCount.Name = "numEventsCount";
+            this.numEventsCount.Size = new System.Drawing.Size(107, 23);
+            this.numEventsCount.TabIndex = 11;
+            this.numEventsCount.Value = new decimal(new int[] {
+            6,
+            0,
+            0,
+            0});
+            // 
+            // bGenerateEvents
+            // 
+            this.bGenerateEvents.Location = new System.Drawing.Point(119, 20);
+            this.bGenerateEvents.Name = "bGenerateEvents";
+            this.bGenerateEvents.Size = new System.Drawing.Size(75, 25);
+            this.bGenerateEvents.TabIndex = 13;
+            this.bGenerateEvents.Text = "Generate";
+            this.bGenerateEvents.UseVisualStyleBackColor = true;
+            this.bGenerateEvents.Click += new System.EventHandler(this.bGenerateEvents_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.bGenerateEvents);
+            this.groupBox2.Controls.Add(this.numEventsCount);
+            this.groupBox2.Location = new System.Drawing.Point(10, 12);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 53);
+            this.groupBox2.TabIndex = 14;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Generate events";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1123, 558);
+            this.ClientSize = new System.Drawing.Size(1123, 609);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.chAllowCreateNewCell);
             this.Controls.Add(this.chDragDrop);
             this.Controls.Add(this.groupBox1);
@@ -384,6 +428,8 @@ namespace DrawnTableControl.Demo
             this.groupBox1.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numEventsCount)).EndInit();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -415,6 +461,9 @@ namespace DrawnTableControl.Demo
         private System.Windows.Forms.CheckBox chAllowCreateNewCell;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.CheckBox chColorPast;
+        private System.Windows.Forms.NumericUpDown numEventsCount;
+        private System.Windows.Forms.Button bGenerateEvents;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }
 

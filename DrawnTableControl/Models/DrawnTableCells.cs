@@ -27,20 +27,13 @@ namespace DrawnTableControl.Models
         }
 
         #region Cells
-        internal int GetNextId()
-        {
-            return ++lastId;
-        }
+        internal int GetNextId() =>
+            ++lastId;
 
-        public bool Contains(DrawnTableCell cell)
-        {
-            return cells.Contains(cell);
-        }
+        public bool Contains(DrawnTableCell cell) =>
+            cells.Contains(cell);
 
-        public int Count
-        {
-            get => cells.Count;
-        }
+        public int Count => cells.Count;
 
         #region Area
         internal RectangleF GetArea(DrawnTableCell cell)
@@ -361,7 +354,7 @@ namespace DrawnTableControl.Models
             private readonly DrawnTable table;
             private readonly Color[,] backColors;
 
-            public DrawnTableBackColors(DrawnTable table)
+            internal DrawnTableBackColors(DrawnTable table)
             {
                 this.table = table;
                 backColors = new Color[table?.RowCount() ?? 0, table?.ColumnCount() ?? 0];

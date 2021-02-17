@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace DrawnTableControl.Services
 {
-    public class DeferredExecution
+    internal class DeferredExecution
     {
         private Task worker;
         private Action toExecute;
