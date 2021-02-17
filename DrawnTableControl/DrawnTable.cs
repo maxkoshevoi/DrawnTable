@@ -18,7 +18,9 @@ namespace DrawnTableControl
         /// Maximum redrawing frequency of the element. 60 = 60 times per second
         /// </summary>
         public int RefreshRate { get; } = 60;
+
         public bool ShowToolTip { get; set; } = true;
+
         private bool allowDragDrop = false;
         public bool AllowDragDrop
         {
@@ -35,6 +37,7 @@ namespace DrawnTableControl
             }
         }
         public bool AllowCreateNewCells { get; set; } = false;
+
         private DrawnTableOverlapOptions ifCellsOverlap = DrawnTableOverlapOptions.ThrowError;
         /// <summary>
         /// Attention! This option allow cell to be overlapped by another cell been added via AddCell method only.

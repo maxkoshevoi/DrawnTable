@@ -33,7 +33,7 @@ namespace DrawnTableControl.Services
         }
 
         /// <summary>
-		/// Draws chart on the printer graphics.
+		/// Draws table on the printer graphics.
 		/// </summary>
         /// <param name="graphics">Printer graphics.</param>
 		/// <param name="area">Position to draw in the graphics.</param>
@@ -69,7 +69,7 @@ namespace DrawnTableControl.Services
         }
 
         /// <summary>
-		/// Prints chart.
+		/// Prints table.
 		/// </summary>
 		/// <param name="showPrintDialog">Indicates if printing dialog should be shown.</param>
 		public void Print(bool showPrintDialog)
