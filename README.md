@@ -2,7 +2,7 @@
 Custom WinForms control based on PictureBox for creating versatile tables.<br/>
 It's fast, uses almost no memory, doesn't have any dependencies, and not limited by limitations of WinForms since it draws itself from scrach.
 
-![Demo app](Images/Screenshot1.jpg)
+![Demo app](https://raw.githubusercontent.com/maxkoshevoi/DrawnTable/main/Images/Screenshot1.jpg)
 
 ## Installation
 
@@ -43,4 +43,4 @@ int columnIndex = headers.Day.GetIndexByValue(date);
 ```
 See demo appication for more usage samples.
 
-![Demo app](Images/demo.gif)
+![Demo app](https://raw.githubusercontent.com/maxkoshevoi/DrawnTable/main/Images/demo.gif)
