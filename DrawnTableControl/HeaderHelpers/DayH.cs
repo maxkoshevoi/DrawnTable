@@ -38,7 +38,7 @@ namespace DrawnTableControl.HeaderHelpers
             return GenerateHeaders(start, start.AddDays(6), null, format, toTitleCase);
         }
 
-        public IEnumerable<DrawnTableHeader> GenerateHeaders(DateTime start, DateTime end, Func<DateTime, bool> condition = null, string format = "dddd", bool toTitleCase = true)
+        public IEnumerable<DrawnTableHeader> GenerateHeaders(DateTime start, DateTime end, Func<DateTime, bool>? condition = null, string format = "dddd", bool toTitleCase = true)
         {
             start = start.Date;
             end = end.Date;
@@ -72,7 +72,7 @@ namespace DrawnTableControl.HeaderHelpers
 
         public int GetIndexByValue(DateTime day) => lastResult.IndexOf(day.Date);
 
-        public int GetNearestIndexByDay(DateTime day, Func<DateTime, bool> predicate = null)
+        public int GetNearestIndexByDay(DateTime day, Func<DateTime, bool>? predicate = null)
         {
             predicate ??= _ => true;
 

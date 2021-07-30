@@ -4,6 +4,7 @@ using DrawnTableControl.Models;
 using DrawnTableControl.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace DrawnTableControl
         private DrawnTableOverlapOptions ifCellsOverlap = DrawnTableOverlapOptions.ThrowError;
         /// <summary>
         /// Attention! This option allow cell to be overlapped by another cell been added via AddCell method only.
-        /// If option "Hide" is chosen, once cells overlapped each other they got removed from table and basicly became impossible to interact with.
+        /// If option "Hide" is chosen, once cells overlapped each other they got removed from table and basically became impossible to interact with.
         /// If option "Merge" is chosen, once cells overlapped each other their values need to be merged manually by CellsMerging event.
         /// </summary>
         public DrawnTableOverlapOptions IfCellsOverlap
@@ -92,6 +93,7 @@ namespace DrawnTableControl
         }
 
         // Table information
+        [MemberNotNullWhen(true, nameof(table))]
         public bool IsEnabled { get; private set; } = false;
         public RectangleF CellsArea { get; private set; }
         public RectangleF TableArea { get; private set; }
@@ -116,7 +118,7 @@ namespace DrawnTableControl
         public DrawnTableCells Cells { get; private set; }
         //public int CellMargin { get; set; } = 2;
 
-        internal Bitmap table { get; private set; }
+        internal Bitmap? table { get; private set; }
 
         private readonly PBDrawnTable Owner;
         internal DeferredExecution dRedrawEx;
@@ -126,52 +128,25 @@ namespace DrawnTableControl
         #endregion
 
         #region Events
-        public event EventHandler<CellMovedEventArgs> CellDragOver;
-        public event EventHandler<CellMovedEventArgs> CellDragDropFinished;
-        public event EventHandler<CellClickEventArgs> CellWithValueClick;
-        public event EventHandler<CellChangedEventArgs> CellCreated;
-        public event EventHandler<CellChangedEventArgs> CellCreating;
-        public event EventHandler<CellOverlapEventArgs> CellOverlapPlaceholderClick;
-        public event EventHandler<CellsMergingEventArgs> CellsMerging;
-        public event EventHandler<CellCopiedEventArgs> CellCopied;
-        public event EventHandler<CellPastedEventArgs> CellPasted;
+        public event EventHandler<CellMovedEventArgs>? CellDragOver;
+        public event EventHandler<CellMovedEventArgs>? CellDragDropFinished;
+        public event EventHandler<CellClickEventArgs>? CellWithValueClick;
+        public event EventHandler<CellChangedEventArgs>? CellCreated;
+        public event EventHandler<CellChangedEventArgs>? CellCreating;
+        public event EventHandler<CellOverlapEventArgs>? CellOverlapPlaceholderClick;
+        public event EventHandler<CellsMergingEventArgs>? CellsMerging;
+        public event EventHandler<CellCopiedEventArgs>? CellCopied;
+        public event EventHandler<CellPastedEventArgs>? CellPasted;
 
-        internal virtual void OnCellDragOver(CellMovedEventArgs e)
-        {
-            CellDragOver?.Invoke(this, e);
-        }
-        internal virtual void OnCellDragDropFinished(CellMovedEventArgs e)
-        {
-            CellDragDropFinished?.Invoke(this, e);
-        }
-        internal virtual void OnCellWithValueClick(CellClickEventArgs e)
-        {
-            CellWithValueClick?.Invoke(this, e);
-        }
-        internal virtual void OnCellCreating(CellChangedEventArgs e)
-        {
-            CellCreating?.Invoke(this, e);
-        }
-        internal virtual void OnCellCreated(CellChangedEventArgs e)
-        {
-            CellCreated?.Invoke(this, e);
-        }
-        internal virtual void OnCellOverlapPlaceholderClick(CellOverlapEventArgs e)
-        {
-            CellOverlapPlaceholderClick?.Invoke(this, e);
-        }
-        internal virtual void OnCellsMerging(CellsMergingEventArgs e)
-        {
-            CellsMerging?.Invoke(this, e);
-        }
-        internal virtual void OnCellCopied(CellCopiedEventArgs e)
-        {
-            CellCopied?.Invoke(this, e);
-        }
-        internal virtual void OnCellPasted(CellPastedEventArgs e)
-        {
-            CellPasted?.Invoke(this, e);
-        }
+        internal virtual void OnCellDragOver(CellMovedEventArgs e) => CellDragOver?.Invoke(this, e);
+        internal virtual void OnCellDragDropFinished(CellMovedEventArgs e) => CellDragDropFinished?.Invoke(this, e);
+        internal virtual void OnCellWithValueClick(CellClickEventArgs e) => CellWithValueClick?.Invoke(this, e);
+        internal virtual void OnCellCreating(CellChangedEventArgs e) => CellCreating?.Invoke(this, e);
+        internal virtual void OnCellCreated(CellChangedEventArgs e) => CellCreated?.Invoke(this, e);
+        internal virtual void OnCellOverlapPlaceholderClick(CellOverlapEventArgs e) => CellOverlapPlaceholderClick?.Invoke(this, e);
+        internal virtual void OnCellsMerging(CellsMergingEventArgs e) => CellsMerging?.Invoke(this, e);
+        internal virtual void OnCellCopied(CellCopiedEventArgs e) => CellCopied?.Invoke(this, e);
+        internal virtual void OnCellPasted(CellPastedEventArgs e) => CellPasted?.Invoke(this, e);
         #endregion
 
         internal DrawnTable(PBDrawnTable owner)
@@ -203,7 +178,7 @@ namespace DrawnTableControl
         public void Remove()
         {
             IsEnabled = false;
-            Cells = null;
+            Cells = new DrawnTableCells(this);
             table?.Dispose();
             table = null;
             Owner.mouseDown = false;
@@ -224,16 +199,10 @@ namespace DrawnTableControl
             CellPasted = null;
         }
 
-        private RectangleF GetDefaultArea()
-        {
-            return new RectangleF(0, 0, Owner.Width, Owner.Height);
-        }
+        private RectangleF GetDefaultArea() => new(0, 0, Owner.Width, Owner.Height);
 
         internal void Resize() => Resize(GetDefaultArea());
-        internal void Resize(RectangleF newTableArea)
-        {
-            dRedrawEx.Execute(() => ActualRedraw(newTableArea));
-        }
+        internal void Resize(RectangleF newTableArea) => dRedrawEx.Execute(() => ActualRedraw(newTableArea));
 
         public Font GetDefaultFont()
         {
@@ -260,10 +229,7 @@ namespace DrawnTableControl
             return graphics;
         }
 
-        public void Redraw()
-        {
-            dRedrawEx.Execute(() => ActualRedraw());
-        }
+        public void Redraw() => dRedrawEx.Execute(() => ActualRedraw());
 
         private void ActualRedraw(RectangleF area = default)
         {
@@ -305,7 +271,7 @@ namespace DrawnTableControl
             g.DrawImage(table, TableArea);
 
             // Coping cells and back colors to draw them in the separate thread
-            Dictionary<DrawnTableCell, RectangleF> currCells = null;
+            Dictionary<DrawnTableCell, RectangleF> currCells = null!;
             Owner.Invoke(new Action(() =>
             {
                 currCells = Cells.Select(c => (DrawnTableCell)c.Clone(true)).ToDictionary(x => x, i => RectangleF.Empty);
@@ -374,10 +340,7 @@ namespace DrawnTableControl
 
         private void DrawTable(Graphics g, SizeF size, List<DrawnTableHeader> cols, List<DrawnTableHeader> rows, Font font)
         {
-            if (cols.Count == 0 || rows.Count == 0)
-            {
-                return;
-            }
+            if (cols.Count == 0 || rows.Count == 0) return;
 
             const int div = 1;
             float colHeaderH = cols.Max(c => TextRenderer.MeasureText(c.Text, font).Height);
@@ -475,7 +438,7 @@ namespace DrawnTableControl
             RowHeight = rowH;
         }
 
-        internal RectangleF DrawCell(DrawnTableCell cell, Graphics g = null)
+        internal RectangleF DrawCell(DrawnTableCell cell, Graphics? g = null)
         {
             RectangleF cellArea = GetCellArea(cell.Location);
             if (cell.Rowspan != 1)
@@ -492,7 +455,8 @@ namespace DrawnTableControl
 
             return res;
         }
-        internal static RectangleF DrawCell(string text, Font font, Brush brush, RectangleF area, StringFormat format = null, Graphics g = null)
+
+        internal static RectangleF DrawCell(string? text, Font font, Brush brush, RectangleF area, StringFormat? format = null, Graphics? g = null)
         {
             const int padding = 2;
 
@@ -624,10 +588,7 @@ namespace DrawnTableControl
             return headerCount;
         }
 
-        public void SuspendRedrawing()
-        {
-            isRedrawingSuspended = true;
-        }
+        public void SuspendRedrawing() => isRedrawingSuspended = true;
 
         public void ResumeRedrawing()
         {

@@ -7,16 +7,16 @@ namespace DrawnTableControl.Services
 {
     internal class DeferredExecution
     {
-        private Task worker;
-        private Action toExecute;
+        private Task? worker;
+        private Action? toExecute;
 
-        public Control InvokeControl;
+        public Control? InvokeControl;
         public volatile int MinDelay;
         private volatile bool isDoingWork;
         private bool waitToPush;
         private bool isPaused;
 
-        public DeferredExecution(int minDelay, Control invokeControl = null)
+        public DeferredExecution(int minDelay, Control? invokeControl = null)
         {
             InvokeControl = invokeControl;
             MinDelay = minDelay;
@@ -25,15 +25,9 @@ namespace DrawnTableControl.Services
             isDoingWork = false;
         }
 
-        public void Pause()
-        {
-            isPaused = true;
-        }
+        public void Pause() => isPaused = true;
 
-        public void Resume()
-        {
-            isPaused = false;
-        }
+        public void Resume() => isPaused = false;
 
         public void Execute(Action func)
         {
@@ -46,7 +40,7 @@ namespace DrawnTableControl.Services
             }
         }
 
-        private void DoWork()
+        private async Task DoWork()
         {
             try
             {
@@ -55,7 +49,7 @@ namespace DrawnTableControl.Services
                     if (toExecute == null || isPaused)
                     {
                         isDoingWork = false;
-                        Thread.Sleep(1);
+                        await Compatibility.TaskDelay(1);
                         continue;
                     }
 
@@ -73,7 +67,7 @@ namespace DrawnTableControl.Services
                         action.Invoke();
                     }
 
-                    Thread.Sleep(MinDelay);
+                    await Compatibility.TaskDelay(MinDelay);
                 } while (true);
             }
 #pragma warning disable CS0168, IDE0059

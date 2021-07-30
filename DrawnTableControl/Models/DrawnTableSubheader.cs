@@ -8,7 +8,7 @@ namespace DrawnTableControl.Models
         public string Text { get; }
         public Color ForeColor { get; } = Color.Black;
         public int Span { get; }
-        public object Tag { get; set; }
+        public object? Tag { get; set; }
 
         internal StringFormat Format { get; }
 
@@ -17,7 +17,7 @@ namespace DrawnTableControl.Models
             StringAlignment alignment = StringAlignment.Center, 
             StringAlignment lineAlignment = StringAlignment.Center, 
             int span = 1, 
-            object tag = null)
+            object? tag = null)
         {
             Text = text ?? "";
             if (foreColor.HasValue)
@@ -38,9 +38,6 @@ namespace DrawnTableControl.Models
             Tag = tag;
         }
 
-        public override string ToString()
-        {
-            return Text;
-        }
+        public override string ToString() => Text;
     }
 }

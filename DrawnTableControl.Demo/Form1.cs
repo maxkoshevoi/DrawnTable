@@ -226,7 +226,7 @@ namespace DrawnTableControl.Demo
         private void Table_CellOverlapPlaceholderClick(object sender, CellOverlapEventArgs e)
         {
             List<Event> events = e.OverlappingCells.Select(oc => (Event)oc.Value).ToList();
-            MessageBox.Show($"{events.Count} events are overlaping", "Overlapped cell clicked");
+            MessageBox.Show($"{events.Count} events are overlapping", "Overlapped cell clicked");
         }
 
         private void Table_CellCreating(object sender, CellChangedEventArgs e)

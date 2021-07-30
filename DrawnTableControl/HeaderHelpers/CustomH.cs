@@ -17,7 +17,7 @@ namespace DrawnTableControl.HeaderHelpers
         public void Add(string text) =>
             Headers.Add(new DrawnTableHeader(text));
 
-        public void Add(string text, object tag) =>
+        public void Add(string text, object? tag) =>
             Headers.Add(new DrawnTableHeader(text, tag: tag));
 
         public void Add(DrawnTableHeader header) =>
@@ -26,7 +26,7 @@ namespace DrawnTableControl.HeaderHelpers
         public void AddRange(IEnumerable<string> dataCollection) =>
             Headers.AddRange(dataCollection.Select(d => new DrawnTableHeader(d)));
 
-        public void AddRange(IEnumerable<(string text, object tag)> dataTagCollection) =>
+        public void AddRange(IEnumerable<(string text, object? tag)> dataTagCollection) =>
             Headers.AddRange(dataTagCollection.Select(dt => new DrawnTableHeader(dt.text, tag: dt.tag)));
 
         public void AddRange(IEnumerable<DrawnTableHeader> headerCollection) =>
@@ -49,7 +49,7 @@ namespace DrawnTableControl.HeaderHelpers
             return GetIndexByHeader(match[0]);
         }
 
-        public int GetIndexByHeaderTag(object tag)
+        public int GetIndexByHeaderTag(object? tag)
         {
             var match = Headers.Where(x => x.Tag?.Equals(tag) == true).ToList();
             if (match.Count == 0) return -1;
@@ -57,7 +57,7 @@ namespace DrawnTableControl.HeaderHelpers
             return GetIndexByHeader(match[0]);
         }
 
-        public DrawnTableHeader this[int index]
+        public DrawnTableHeader? this[int index]
         {
             get
             {

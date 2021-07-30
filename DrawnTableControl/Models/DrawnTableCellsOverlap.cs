@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 
 namespace DrawnTableControl.Models
 {
@@ -8,7 +7,7 @@ namespace DrawnTableControl.Models
     {
         public new List<DrawnTableCell> Value { get; }
 
-        internal DrawnTableCellsOverlap(CellLocation location, List<DrawnTableCell> value, int rowspan = 1, DrawnTable table = null) : base(location, null, rowspan, table)
+        internal DrawnTableCellsOverlap(CellLocation location, List<DrawnTableCell> value, int rowspan = 1, DrawnTable? table = null) : base(location, null, rowspan, table)
         {
             Value = value;
             Margin = 0;

@@ -9,7 +9,7 @@ namespace DrawnTableControl.Services
     {
         private readonly DrawnTable table;
 
-        private PrintDocument printDocument;
+        private PrintDocument? printDocument;
         public PrintDocument PrintDocument
         {
             set => printDocument = value;
@@ -105,6 +105,8 @@ namespace DrawnTableControl.Services
         {
             if (table.IsEnabled)
             {
+                _ = ev.Graphics ?? throw new NullReferenceException("ev.Graphics");
+
                 Rectangle position = ev.MarginBounds;
                 PrintPaint(ev.Graphics, position);
             }

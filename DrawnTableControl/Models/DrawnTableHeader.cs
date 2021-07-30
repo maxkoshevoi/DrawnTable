@@ -12,7 +12,7 @@ namespace DrawnTableControl.Models
             StringAlignment alignment = StringAlignment.Center, 
             StringAlignment lineAlignment = StringAlignment.Center, 
             int span = 1, 
-            object tag = null) 
+            object? tag = null) 
             : base(text, foreColor, alignment, lineAlignment, span, tag)
         {
         }

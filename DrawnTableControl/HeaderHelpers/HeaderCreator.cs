@@ -13,9 +13,9 @@ namespace DrawnTableControl.HeaderHelpers
         public CustomH Custom2 { get; } = new();
 
         public static List<DrawnTableHeader> ParseList(IEnumerable<string> collection) =>
-            ParseList(collection.Select(c => (c, (object)null)));
+            ParseList(collection.Select(c => (c, (object?)null)));
 
-        public static List<DrawnTableHeader> ParseList(IEnumerable<(string text, object tag)> collection) =>
+        public static List<DrawnTableHeader> ParseList(IEnumerable<(string text, object? tag)> collection) =>
             collection.Select(item => new DrawnTableHeader(item.text, tag: item.tag)).ToList();
 
         public int GetRealIndex(List<DrawnTableHeader> headers, int headerIndex, int subheaderIndex)
@@ -45,7 +45,7 @@ namespace DrawnTableControl.HeaderHelpers
             return realIndex;
         }
 
-        public (DrawnTableHeader, DrawnTableSubheader) GetHeadersByRealIndex(List<DrawnTableHeader> headers, int realIndex)
+        public (DrawnTableHeader?, DrawnTableSubheader?) GetHeadersByRealIndex(List<DrawnTableHeader> headers, int realIndex)
         {
             if (realIndex < 0)
             {

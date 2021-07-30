@@ -72,7 +72,7 @@ namespace DrawnTableControl.Models
         #endregion
 
         #region Add
-        public void Add(int row, int col, object value, int rowspan = 1)
+        public void Add(int row, int col, object? value, int rowspan = 1)
         {
             DrawnTableCell cell = new(new CellLocation(row, col), value, rowspan);
             Add(cell);
@@ -139,20 +139,20 @@ namespace DrawnTableControl.Models
                 newCell.Table = null;
                 if (existingCell is DrawnTableCellsOverlap || newCell is DrawnTableCellsOverlap)
                 {
-                    if (existingCell is DrawnTableCellsOverlap && newCell is DrawnTableCellsOverlap)
+                    if (existingCell is DrawnTableCellsOverlap existingOverlap && newCell is DrawnTableCellsOverlap newOverlap)
                     {
-                        foreach (DrawnTableCell item in (newCell as DrawnTableCellsOverlap).Value)
+                        foreach (DrawnTableCell item in newOverlap.Value)
                         {
-                            (existingCell as DrawnTableCellsOverlap).Value.Add(item);
+                            existingOverlap.Value.Add(item);
                         }
                     }
-                    else if (existingCell is DrawnTableCellsOverlap)
+                    else if (existingCell is DrawnTableCellsOverlap existingOverlap2)
                     {
-                        (existingCell as DrawnTableCellsOverlap).Value.Add(newCell);
+                        existingOverlap2.Value.Add(newCell);
                     }
                     else
                     {
-                        (newCell as DrawnTableCellsOverlap).Value.Add(existingCell);
+                        ((DrawnTableCellsOverlap)newCell).Value.Add(existingCell);
                         var tmp = existingCell;
                         existingCell = newCell;
                         newCell = tmp;
@@ -168,7 +168,7 @@ namespace DrawnTableControl.Models
                 else
                 {
                     Rectangle rct = Projection(newCell, existingCell);
-                    DrawnTableCellsOverlap o = new(new CellLocation(rct.Y, rct.X), new List<DrawnTableCell>() { existingCell, newCell }, rct.Height);
+                    DrawnTableCellsOverlap o = new(new CellLocation(rct.Y, rct.X), new() { existingCell, newCell }, rct.Height);
                     RectangleF cArea = table.DrawCell(o);
 
                     totalArea = cArea;
@@ -225,7 +225,7 @@ namespace DrawnTableControl.Models
             List<DrawnTableCell> overlaps = new();
             for (int i = 0; i < cell.Rowspan; i++)
             {
-                DrawnTableCell overlap = this[cell.Location.Row + i, cell.Location.Column];
+                DrawnTableCell? overlap = this[cell.Location.Row + i, cell.Location.Column];
                 if (overlap != null && overlap != cell && !overlaps.Contains(overlap))
                 {
                     overlaps.Add(overlap);
@@ -240,7 +240,7 @@ namespace DrawnTableControl.Models
 
         public bool Remove(int row, int col)
         {
-            DrawnTableCell cell = this[row, col];
+            DrawnTableCell? cell = this[row, col];
             if (cell == null) return false;
 
             bool res = cells.Remove(cell);
@@ -299,12 +299,9 @@ namespace DrawnTableControl.Models
         #endregion
 
         #region Indexers
-        public DrawnTableCell this[CellLocation cellLocation]
-        {
-            get => this[cellLocation.Row, cellLocation.Column];
-        }
+        public DrawnTableCell? this[CellLocation cellLocation] => this[cellLocation.Row, cellLocation.Column];
 
-        public DrawnTableCell this[int row, int col]
+        public DrawnTableCell? this[int row, int col]
         {
             get
             {
@@ -319,7 +316,7 @@ namespace DrawnTableControl.Models
             }
         }
 
-        public DrawnTableCell this[PointF location]
+        public DrawnTableCell? this[PointF location]
         {
             get
             {
@@ -336,15 +333,9 @@ namespace DrawnTableControl.Models
         }
         #endregion
 
-        public IEnumerator GetEnumerator()
-        {
-            return ((IEnumerable<DrawnTableCell>)cells).GetEnumerator();
-        }
+        public IEnumerator GetEnumerator() => ((IEnumerable<DrawnTableCell>)cells).GetEnumerator();
 
-        IEnumerator<DrawnTableCell> IEnumerable<DrawnTableCell>.GetEnumerator()
-        {
-            return ((IEnumerable<DrawnTableCell>)cells).GetEnumerator();
-        }
+        IEnumerator<DrawnTableCell> IEnumerable<DrawnTableCell>.GetEnumerator() => ((IEnumerable<DrawnTableCell>)cells).GetEnumerator();
 
         #endregion
 
@@ -383,10 +374,7 @@ namespace DrawnTableControl.Models
                 }
             }
 
-            public void ResetAll()
-            {
-                SetAll(Color.Empty);
-            }
+            public void ResetAll() => SetAll(Color.Empty);
 
             public void SetRow(int rowIndex, Color color)
             {

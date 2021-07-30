@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
 namespace DrawnTableControl.Models
@@ -8,8 +9,8 @@ namespace DrawnTableControl.Models
         #region Variables
         internal int InnerId { get; private set; } = 0;
 
-        private DrawnTable table;
-        public DrawnTable Table
+        private DrawnTable? table;
+        public DrawnTable? Table
         {
             get => table;
             internal set
@@ -37,8 +38,8 @@ namespace DrawnTableControl.Models
                 }
             }
         }
-        private object value;
-        public object Value { get => value; set { this.value = value; RedrawTable(); } }
+        private object? value;
+        public object? Value { get => value; set { this.value = value; RedrawTable(); } }
 
         private CellLocation location;
         public CellLocation Location { get => location; set { location = value; UpdateArea(); } }
@@ -88,9 +89,9 @@ namespace DrawnTableControl.Models
 
         public DrawnTableCell(CellLocation location) : this(location, null, 1, null) { }
 
-        public DrawnTableCell(CellLocation location, object value, int rowspan = 1) : this(location, value, rowspan, null) { }
+        public DrawnTableCell(CellLocation location, object? value, int rowspan = 1) : this(location, value, rowspan, null) { }
 
-        internal DrawnTableCell(CellLocation location, object value, int rowspan, DrawnTable table = null) : this()
+        internal DrawnTableCell(CellLocation location, object? value, int rowspan, DrawnTable? table = null) : this()
         {
             ResetInnerId(table);
             Location = location;
@@ -105,25 +106,20 @@ namespace DrawnTableControl.Models
             ResetStyle();
         }
 
+        [MemberNotNull(nameof(brush), nameof(font))]
         public void ResetStyle()
         {
-            Brush = (SolidBrush)Brushes.DeepSkyBlue;
-            if (!GetFontFromTable) Font = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Regular);
+            Brush = brush = (SolidBrush)Brushes.DeepSkyBlue;
+            if (!GetFontFromTable || font == null) Font = font = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Regular);
             Margin = 2;
             Alignment = StringAlignment.Near;
             LineAlignment = StringAlignment.Near;
             GetFontFromTable = true;
         }
 
-        private void ResetInnerId(DrawnTable table)
-        {
-            InnerId = table?.Cells.GetNextId() ?? 0;
-        }
+        private void ResetInnerId(DrawnTable? table) => InnerId = table?.Cells.GetNextId() ?? 0;
 
-        private void UpdateArea()
-        {
-            Table?.Cells.UpdateArea(this);
-        }
+        private void UpdateArea() => Table?.Cells.UpdateArea(this);
 
         private void RedrawTable()
         {
@@ -132,33 +128,13 @@ namespace DrawnTableControl.Models
             Table.Redraw();
         }
 
-        public RectangleF Area => Table.Cells.GetArea(this);
+        public RectangleF Area => Table?.Cells.GetArea(this) ?? RectangleF.Empty;
 
         #region override
-        public override string ToString()
-        {
-            return Value?.ToString();
-        }
+        public override string? ToString() => Value?.ToString();
 
-        public static bool operator ==(DrawnTableCell one, DrawnTableCell other)
-        {
-            return one?.Table == other?.Table && one?.InnerId == other?.InnerId;
-        }
-        public static bool operator !=(DrawnTableCell one, DrawnTableCell other) => !(one == other);
-
-        public override bool Equals(object obj)
-        {
-            if (obj is DrawnTableCell cell)
-            {
-                return cell == this;
-            }
-            return base.Equals(obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        public static bool operator ==(DrawnTableCell? one, DrawnTableCell? other) => one?.Equals(other) ?? other is null;
+        public static bool operator !=(DrawnTableCell? one, DrawnTableCell? other) => !(one == other);
 
         private bool isCloning = false;
         public object Clone(bool isCopyTable = false)
@@ -179,10 +155,17 @@ namespace DrawnTableControl.Models
             return clone;
         }
 
-        public object Clone()
+        public object Clone() => Clone(false);
+
+        public override bool Equals(object? obj)
         {
-            return Clone(false);
+            return obj is DrawnTableCell cell &&
+                   InnerId == cell.InnerId &&
+                   Table == cell.Table;
         }
+
+        public override int GetHashCode() => base.GetHashCode();
+
         #endregion
     }
 }
