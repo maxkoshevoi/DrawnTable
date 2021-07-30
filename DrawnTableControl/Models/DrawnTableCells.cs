@@ -74,7 +74,7 @@ namespace DrawnTableControl.Models
         #region Add
         public void Add(int row, int col, object value, int rowspan = 1)
         {
-            DrawnTableCell cell = new DrawnTableCell(new CellLocation(row, col), value, rowspan);
+            DrawnTableCell cell = new(new CellLocation(row, col), value, rowspan);
             Add(cell);
         }
 
@@ -168,7 +168,7 @@ namespace DrawnTableControl.Models
                 else
                 {
                     Rectangle rct = Projection(newCell, existingCell);
-                    DrawnTableCellsOverlap o = new DrawnTableCellsOverlap(new CellLocation(rct.Y, rct.X), new List<DrawnTableCell>() { existingCell, newCell }, rct.Height);
+                    DrawnTableCellsOverlap o = new(new CellLocation(rct.Y, rct.X), new List<DrawnTableCell>() { existingCell, newCell }, rct.Height);
                     RectangleF cArea = table.DrawCell(o);
 
                     totalArea = cArea;
@@ -179,7 +179,7 @@ namespace DrawnTableControl.Models
             {
                 newCell.Table = null;
                 Rectangle rct = Projection(newCell, existingCell);
-                DrawnTableCell result = new DrawnTableCell(new CellLocation(rct.Y, rct.X), null, rct.Height);
+                DrawnTableCell result = new(new CellLocation(rct.Y, rct.X), null, rct.Height);
                 if (newCell.Value == existingCell.Value) result.Value = newCell.Value;
                 result.GetFontFromTable = (newCell.GetFontFromTable == existingCell.GetFontFromTable) && newCell.GetFontFromTable;
                 if (result.GetFontFromTable == false)
@@ -195,7 +195,7 @@ namespace DrawnTableControl.Models
                 if (newCell.LineAlignment == existingCell.LineAlignment) result.LineAlignment = newCell.LineAlignment;
                 if (newCell.Margin == existingCell.Margin) result.Margin = newCell.Margin;
 
-                CellsMergingEventArgs e = new CellsMergingEventArgs(existingCell, newCell, result);
+                CellsMergingEventArgs e = new(existingCell, newCell, result);
                 table.OnCellsMerging(e);
 
                 RectangleF cArea = table.DrawCell(e.ResultCell);
@@ -207,7 +207,7 @@ namespace DrawnTableControl.Models
 
         private static Rectangle Projection(DrawnTableCell cell1, DrawnTableCell cell2)
         {
-            Rectangle rct = new Rectangle(cell2.Location.Column, cell2.Location.Row, 1, cell2.Rowspan);
+            Rectangle rct = new(cell2.Location.Column, cell2.Location.Row, 1, cell2.Rowspan);
             if (cell1.Location.Row < rct.Y)
             {
                 rct.Height += (rct.Y - cell1.Location.Row);
@@ -222,7 +222,7 @@ namespace DrawnTableControl.Models
 
         public List<DrawnTableCell> GetOverlap(DrawnTableCell cell)
         {
-            List<DrawnTableCell> overlaps = new List<DrawnTableCell>();
+            List<DrawnTableCell> overlaps = new();
             for (int i = 0; i < cell.Rowspan; i++)
             {
                 DrawnTableCell overlap = this[cell.Location.Row + i, cell.Location.Column];
@@ -280,7 +280,7 @@ namespace DrawnTableControl.Models
                 throw new ArgumentException($"'{nameof(Value)}' can't be NULL", nameof(Value));
             }
 
-            List<int> toRemove = new List<int>();
+            List<int> toRemove = new();
             foreach (DrawnTableCell cell in cells)
             {
                 if (cell.Value != null && cell.Value.Equals(Value))

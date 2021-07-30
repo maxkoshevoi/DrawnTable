@@ -628,7 +628,7 @@ namespace DrawnTableControl.Demo
             area.Height -= (int)(dSize.Height + 15);
 
             // Print header
-            Font headerFont = new Font("Segoe UI", 14.25F);
+            Font headerFont = new("Segoe UI", 14.25F);
             SolidBrush headerColor = new(Color.DimGray);
 
             string header = "DrawnTable.Demo";

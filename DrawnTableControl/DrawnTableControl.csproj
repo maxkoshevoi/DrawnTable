@@ -6,6 +6,7 @@
     <OutputType>Library</OutputType>
     <UseWindowsForms>true</UseWindowsForms>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    
     <Copyright>Maksym Koshovyi © 2018</Copyright>
     <Authors>Maksym Koshovyi</Authors>
     <PackageId>DrawnTable</PackageId>

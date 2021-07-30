@@ -52,7 +52,7 @@ namespace DrawnTableControl.Models
                 if (rowspan == value) return;
                 if (value < 1)
                 {
-                    throw new ArgumentOutOfRangeException($"{nameof(Rowspan)} cannot be less than 1");
+                    throw new ArgumentOutOfRangeException(nameof(Rowspan), $"{nameof(Rowspan)} cannot be less than 1");
                 }
 
                 rowspan = value;
@@ -73,7 +73,7 @@ namespace DrawnTableControl.Models
                     throw new InvalidOperationException($"{nameof(GetFontFromTable)} is set to true, so you cannot set font by yourself");
                 }
 
-                font = value ?? throw new ArgumentNullException($"{nameof(Font)} cannot be NULL");
+                font = value ?? throw new ArgumentNullException(nameof(Font));
                 RedrawTable();
             }
         }
