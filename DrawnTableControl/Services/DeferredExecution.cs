@@ -42,9 +42,9 @@ namespace DrawnTableControl.Services
 
         private async Task DoWork()
         {
-            try
+            do
             {
-                do
+                try
                 {
                     if (toExecute == null || isPaused)
                     {
@@ -68,14 +68,13 @@ namespace DrawnTableControl.Services
                     }
 
                     await Compatibility.TaskDelay(MinDelay);
-                } while (true);
-            }
-#pragma warning disable CS0168, IDE0059
-            catch (Exception ex)
-            {
-                return;
-            }
-#pragma warning restore CS0168
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    continue;
+                }
+            } while (true);
         }
 
         public bool IsWorking =>
