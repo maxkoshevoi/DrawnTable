@@ -9,12 +9,13 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
 
     <PackageId>DrawnTable</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Copyright>Maksym Koshovyi © 2018</Copyright>
     <Authors>Maksym Koshovyi</Authors>
     <PackageTags>WinForms, table, datagrid, custom-control</PackageTags>
     <Description>Custom WinForms control based on PictureBox for creating versatile tables</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <RepositoryUrl>https://github.com/maxkoshevoi/DrawnTable</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -26,7 +27,11 @@
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
-
+  
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+    
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="all" />
