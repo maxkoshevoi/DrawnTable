@@ -284,7 +284,7 @@ namespace DrawnTableControl
                         }
                         if (string.IsNullOrEmpty(tipText)) return;
 
-                        await Compatibility.TaskDelay(500); 
+                        await Task.Delay(500); 
                         
                         try
                         {

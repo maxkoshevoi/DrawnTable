@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -49,7 +50,7 @@ namespace DrawnTableControl.Services
                     if (toExecute == null || isPaused)
                     {
                         isDoingWork = false;
-                        await Compatibility.TaskDelay(1);
+                        await Task.Delay(1);
                         continue;
                     }
 
@@ -67,7 +68,7 @@ namespace DrawnTableControl.Services
                         action.Invoke();
                     }
 
-                    await Compatibility.TaskDelay(MinDelay);
+                    await Task.Delay(MinDelay);
                 }
                 catch (Exception ex)
                 {
