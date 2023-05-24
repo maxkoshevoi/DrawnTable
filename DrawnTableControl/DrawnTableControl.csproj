@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  
+
   <PropertyGroup>
     <TargetFrameworks>net45;net5.0-windows</TargetFrameworks>
     <LangVersion>latest</LangVersion>
@@ -7,15 +7,24 @@
     <OutputType>Library</OutputType>
     <UseWindowsForms>true</UseWindowsForms>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    
+
+    <PackageId>DrawnTable</PackageId>
+    <Version>1.1.0</Version>
     <Copyright>Maksym Koshovyi © 2018</Copyright>
     <Authors>Maksym Koshovyi</Authors>
-    <PackageId>DrawnTable</PackageId>
-    <RepositoryUrl>https://github.com/maxkoshevoi/DrawnTable</RepositoryUrl>
     <PackageTags>WinForms, table, datagrid, custom-control</PackageTags>
-    <RepositoryType>git</RepositoryType>
-    <Version>1.1.0</Version>
     <Description>Custom WinForms control based on PictureBox for creating versatile tables</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <RepositoryUrl>https://github.com/maxkoshevoi/DrawnTable</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
@@ -24,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.*" PrivateAssets="all" />
   </ItemGroup>
-  
+
 </Project>
