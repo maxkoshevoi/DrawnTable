@@ -1,4 +1,4 @@
-name: Build
+﻿name: 🏭 Build
 
 on:
   push:
@@ -8,12 +8,10 @@ on:
 
 jobs:
   build:
-
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v2
-    - name: Restore dependencies
+    - name: 🏭 Restore dependencies
       run: dotnet restore
-    - name: Build
+    - name: 🏭 Build
       run: dotnet build --no-restore
